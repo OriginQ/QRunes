@@ -1,257 +1,156 @@
-第4章 语句
-=====================
+第5章 函数
+==============
 
-- QRunes中语句近似与人类的自然语言，既有完成单一任务的简单语句也有作为一个集合的一组语句组成的复合语句。同时QRunes既能支持经典辅助类型的条件分支和循环控制结构，也支持经典类型的QIF和QWHILE的量子分支和量子循环控制结构。  
-- QRunes中的语句大部分都是以分号；结尾。
+在QRunes中，函数可以被看作是由开发人员自己定义的为了完成某个功能任务的一组语句的集合，每个QRunes程序都会至多有一个入口函数，在QRunes中入口函数即main函数都是在第三方经典语言中来进行实现。
 
-4.1 简单语句
-------------------
-4.1.1 表达式语句
-*********************
-表达式语句的类型取决于表达式类型，表达式类型参见Chapter 3.2。  
+5.1 函数的声明
+-------------------
+函数声明和变量的定义和声明一样，必须是声明之后才可以使用。函数的声明很函数的定义可以分离开来，同时一个函数只能定义一次，但是可以声明多次。
+
+函数声明的结构如下：
+
+::
+
+ return_type? function_name(args)；
 
 举例如下：
 
 ::
 
- c2 = c1 + 1; //Assign statement
+ qcircuit createCircuit(qubit qu);
 
-4.1.2 声明语句
-*********************
-- QRunes中声明语句主要分为两种：函数的声明和变量的定义与。
-- 具体可以参见Chapter 2.3 和Chapter 5.2，其中变量的定义支持A Q C类型的变量定义。
+返回值，函数名和函数形参列表称为函数原型。函数的声明为定义函数的使用者和调用函数的使用者之间提供了一种天然的接口。
 
-举例如下：
+5.2 函数的定义
+-------------------
+QRunes中，函数是由返回值，函数名，函数参数和一组语句组成。其中函数名在同一个.qrunes文件中必须唯一；函数参数即函数的形式参数，它们由一对圆括号包围并在其中进行声明，形参之间的以逗号进行分割；一组语句即函数的函数体是函数的执行部分。每一个函数都有一个相关联的返回类型。
 
-::
-
- qubit q;// declaration a variable with qubit type named q  
- let i = 3.14;// declaration a variable with assist-classical type which named i and intialized 3.14
-
-4.2 复合语句
-------------------
-- QRunes中复合语句通常按块的概念，表现形式为使用一对花括号{}括起来的语句序列。
-- 在复合语句中的一组语句不仅仅是一堆简单语句的组合，同时根据程序的逻辑要求，一个程序逻辑也被称为一条语句块，比如if,for,qif,qwhile。
-
-例如：
+函数定义的格式如下：
 
 ::
 
-   if (oracle_function[0] == False && oracle_function[1] == True) {  
-        // f(x) = x;  
-        CNOT(q1, q2);  
-    } else if (oracle_function[0] == True && oracle_function[1] == False) {  
-        // f(x) = x + 1;  
-        X(q2);  
-        CNOT(q1, q2);  
-        X(q2);  
-    }        
-
-**注意：**
-::
-
- 1. 与其他语句不同的是，复合语句不是以分号；结尾。
- 2. 只能用在某个函数体中书写。
-
-4.3 函数调用语句
-------------------
-
-4.3.1 量子逻辑门操作函数调用语句
-******************************************
-
-- 在QRunes中所有对于量子比特的操作，我们称为逻辑门函数或者XX门，比如我们常说的X门，Y门，CNOT门，他们都是类似于QRunes的库文件中实现过其函数实现，预先定义好的，用户可以直接通过调用的形式实现逻辑门的操作。
-- 当前QRunes支持18中量子逻辑门函数的操作，其函数声明分别如下：
-
-::
-
- H(qubit);  
- NOT(qubit);    
- T(qubit);      
- S(qubit);      
- Y(qubit);      
- Z(qubit);      
- X1(qubit);      
- Y1(qubit);      
- Z1(qubit);      
- U4(qubit,alpha,beta,gamma,delta);      
- RX(qubit,alpha);      
- RY(qubit,alpha);      
- RZ(qubit,alpha);      
- CNOT(qubit,qubit);     
- CZ(qubit,qubit);      
- CU(qubit,qubit,alpha,beta,gamma,delta);      
- ISwap(qubit,qubit,alpha);       
- CR(qubit,qubit,alpha);   
-
-4.3.2 可变量子逻辑门函数调用语句
-******************************************
-
-- 可变量子逻辑门是构成可变量子线路VQC的基本单位,可变量子逻辑门函数内部维护着一组变量参数以及一组常量参数。 
-- 当前QRunes支持6中可变量子逻辑门函数调用： 
-
-::
-
- VQG_H(qubit);    
- VQG_RX(qubit,alpha);  
- VQG_RY(qubit,alpha);  
- VQG_RZ(qubit,alpha);  
- VQG_CNOT(qubit,qubit);    
- VQG_CZ(qubit,qubit);
-
-4.3.3 经典返回值类型函数调用语句
-******************************************
-
-- 定义一个函数，但是该函数并不会自动的执行。定义了函数仅仅是赋予函数以名称并明确函数被调用时该做些什么。
-
-调用函数才会以给定的参数真正执行这些动作，比如如下函数：
-
-::
-
-    Reset_Qubit_Circuit(qubit q, cbit c, bool setVal) {  
-    Measure(q, c);  
-    if (setVal == False) {  
-        qif (c) {  
-            X(q);  
-        }  
-    } else {  
-        qif (c) {  
-        } qelse {  
-            X(q);  
-        }  
-    }   
-    }  
-    Reset_Qubit(qubit q, cbit c, bool setVal) {     
-    // quantum logic gate function call,and can reference to its function definition  
-        Reset_Qubit_Circuit(q, c, setVal);  
+    return_type? function_name(args){  
+        function_body  
     }
 
-- 其中的Reset_Qubit_Circuit函数在Reset_Qubit中的调用，该表示方法就是函数调用。 
-
-注意：  
-
-::
-
- 1.函数调用语句必须严格按照函数调用的格式进行书写：  
-    function_name(args....);  
- 2.回调函数中的参数必须严格匹配原函数定义中的参数的类型，个数。  
- 3.函数调用语句只能在调用函数体内书写。
-
-4.4 经典辅助控制语句
----------------------
-
-4.4.1选择语句
-*********************
-QRunes中的选择语句主要是if-else格式的语句，其计算流程为根据if中表达式的是否有条件地执行分支语句，其中else分支可以是可选项。
-
-语法结构如下：
-
-::
-
-    if(condition)
-        statement;
-    else
-        statement;
-
 举例如下：
 
 ::
 
-    if (fx) {  
-        X(q[0]);  
-    }else{
-        H(q[0]);
-        X(q[1]);
-    }  
+    Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, bvec oracle_function) {  
+        H(q1);  
+        Measure(q1, c);  
+    }
     
-其中if中的condition必须是一个返回值为bool类型的表达式或者可以转换为bool类型的表达式，此外statement部分可以是用花括号括起来的复合语句。
+5.3 函数的参数
+-------------------
 
-4.4.2 循环语句
-*********************
+- QRunes中函数不能省略或者为空，函数的形参表由一系列的由逗号分隔符分离的参数类型和参数名组成，如果两个形参的类型相同，则其类型必须重复声明。
+- 在QRunes中所有的函数参数都必须命名之后才可以使用。
 
-QRunes中的循环语语句主要是for循环语句，其语法格式如下：
+5.4 函数的返回值
+-------------------
 
-::
+QRunes中函数的返回类型可以是内置类型、复合类型也可以是void类型。
+其中，
 
-    for(initializer:condition:expression)  
-        statement
-
-其中initializer、condition和expression都是以冒号结束，initializer用于循环结构的变量初始化;condition(循环条件)则是用来控制循坏的，当判断条件为true的时候则执行statement;expression用来修改initializer的值。特殊情况如下，当循环结构第一次在求解condition的时候就返回false，则该循环体将始终不会执行。通常，循环体中的statement可以是单个语句也可以是复合语句。
-
-举例如下：
+- 内置类型
 
 ::
 
-    for(let i=0: 1: qlist.size()){
-        VQG_RX(qlist[i],2.0*beta);
+ qprog  
+ qcircuit  
+ variationalCircuit  
+ qubit  
+ cbit  
+
+- 复合类型
+
+::
+
+ 复合类型即由vector关键字构造的类型集合，其中的类型为经典类型。
+
+比如：
+
+::
+
+    vector<cbit>
+
+- void 类型
+
+::
+
+ 函数不返回任何值
+
+- 根据函数的返回值可以将QRunes中的函数分为两个部分：量子函数和经典函数。
+- 其中的返回值为经典类型、经典类型构造的集合类型和void类型为经典函数，其余为量子函数。
+
+函数的定义举例如下：
+
+::
+
+    //quantum function  
+    qu_function(vector<qubit> qvec,vector<cbit> cvec){
+        for(let i = 0:1:len(qvec)){
+            H(qvec[i]);
+            Measure(qvec[i],cvec[i]);
+        }
+        vector<cbit> cc = getCbitNotEqualZero(cvec);
+        for(let c in cc){
+            c = c + 1;
+        }
     }
 
-展示的程序用将以qubit为类型的集合qlist中的每个qubit进行可变量子线路构造的操作。
+::
 
-4.5 量子类型控制语句
--------------------------
-
-4.5.1 QIF语句
-*********************
-QIF的结构如下：
+ 
+    //classical function  
+    vector<cbit> getCbitNotEqualZero(vector<cbit> cvec){  
+        vector<cbit> c2;
+        for(let c in cevc){
+            if(c == 1){
+                c = c + 1;
+                c2.insert(c);
+            }
+        }  
+        return c2;
+    }
 
 ::
 
-    qif(condition)
-        statement
-    qelse
-        statment
+    //return value is null
+    void rotateOperation(vector<qubit> qlist){
+        for(let qu in qlist){
+            H(qlist[i]);
+        }
+    }
 
-与4.4.1中的if相比较，二者的差别在condition和statement中，QIF语句中的condition必须是是经典类型且返回值为bool类型的表达式,statement只能为返回值为经典类型的语句、量子逻辑门操作函数调用语句、返回值为量子类型（QProg,QCircuit）的函数调用、量子比特测量语句和QIF/QWHILE语句。
-
-举例如下：
-
-4.5.2 QWHILE语句
-*********************
-
-QWHIE的结构如下： 
+5.5 函数调用
+-------------------
+函数调用的结构：
 
 ::
 
-    qwhile(condition)  
-        statement
+ function_name(args...);
 
-举例如下：
+其中的实参可以是常量，变量，多个实参之间用逗号进行分割。
 
-::
+函数调用的方式：
+- 函数调用作为表达式中的一项，常用于赋值表达式，也可称为函数调用表达式。
 
-    qif(!c1){  
-        Measure(q[2],c[2]);  
-    }  
-    qelse{  
-        Measure(q[1],c[1]);  
-    }  
-
-与4.4.2中的for相比较，二者的差别在condition和statement中，QWHILE语句中的condition必须是是经典类型且返回值为bool类型的表达式,statement只能为返回值为经典类型的语句、量子逻辑门操作函数调用语句、返回值为量子类型（QProg,QCircuit）的函数调用、量子比特测量语句和QIF/QWHILE语句。  
-
-举例如下：
+举例：
 
 ::
 
- qwhile(c[0] < 3>){ //c is declarated by type cbit  
-    H(qvec[c[0]]);  
-    let i = 1; //the value of declaration statement is assist-classical.EEROR!  
-    c[0] = c[i] + 1;//ERROR?  
-    c[0] = c[0] + 1;  
- } 
+ c = getCbit(cbit c);
 
-4.6 量子比特测量语句
----------------------------
+- 函数作为单独的语句，及函数调用语句
 
-量子测量是指通过量子计算机的测控系统对量子系统进行干扰来获取需要的信息，测量比特使用的是蒙特卡洛方法的测量。
-QRunes中的量子比特测量语句的结构如下：
+举例：
 
 ::
 
- Measure(qubitType,cbitType);
+ ker(qlist,clist);
 
-举例如下：
+- 函数也可以作为另一个函数的实参
 
-::
-
- H(q);  
- Measure(q,c);

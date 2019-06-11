@@ -10,11 +10,10 @@ QRunes
 .. toctree::
    :maxdepth: 2
 
+   chapters/chapter0
    chapters/chapter1
    chapters/chapter2
    chapters/chapter3
    chapters/chapter4
    chapters/chapter5
    chapters/chapter6
-   chapters/chapter7
-   chapters/chapter8

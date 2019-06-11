@@ -1,215 +1,161 @@
-Quick Start
-========================
+第2章 QRunes基本类型与变量
+===========================
 
-1.1 QRunes简介
-------------------
+2.1 QRunes的基本对象类型
+---------------------------
 
-1.2 QRunes开发环境 
-------------------
-1.2.1 QRunes与QPanda/pyQPanda 
-+++++++++++++++++++++++++++++++++
+2.1.1 量子类型 Quantum Type
+++++++++++++++++++++++++++++++
 
-**#### QPanda**
+量子类型的对象描述的是量子芯片上的量子比特。
 
-QPanda SDK是由本源量子推出的，基于量子云服务的，开源的量子软件开发包。用户可基于此开发包开发在云端执行的量子程序。QPanda使用C++语言作为经典宿主语言，支持以QRunes书写的量子语言。
-目前，QPanda支持本地仿真运行模式和云仿真运行模式，最高可支持到32位。Q-Panda提供了一个可执行的命令行程序，通过指令控制量子程序的加载、运行和读出。另外，QPanda提供了一组API，可供用户自行定制功能。
+例如：qubit q;
 
-**#### QPanda 2**
+它在运行期间会映射某一个量子芯片上的量子比特。这种对象只能被最终用于量子逻辑门操作中。它的赋值相当于创建这个映射的别名，并非描述其中的数据的复制。
 
-QPanda 2(Quantum Programming Architecture for NISQ Device Applications)是一个高效的量子计算开发工具库，可用于实现各种量子算法，QPanda 2基于C++实现，并可扩展到Python
+2.1.2 辅助类型 Auxiliary Type 
++++++++++++++++++++++++++++++++++++++++++++
 
-**#### PyQPanda**
+辅助类型是为了更方便创建量子操作的辅助对象。它在编译后的程序中不存在。它可以用于描述一些用于决定量子程序构造的变量或者常量。它也可以是一个编译期间的if判断或者for循环。
 
-PyQPanda我们通过pybind11工具，以一种直接和简明的方式，对QPanda2中的函数、类进行封装，并且提供了几乎完美的映射功能。 封装部分的代码在QPanda2编译时会生成为动态库，从而可以作为python的包引入
+对于一组qubit，例如vector<qubit> qs，我们要创建作用在它们上面的Hadamard门，我们可以利用如下语句：
 
-1.2.2 开发环境配置与运行
-++++++++++++++++++++++++++++
-为了兼容高效与便捷，我们为您提供了C++ 和 Python（pyQPanda）两个版本，pyQPanda封装了C++对外提供的接口。
+::
 
-**#### C++的使用**
+    for (i = 0: qs.size())  
 
-使用QPanda 2相对于pyQPanda会复杂一些，不过学会编译和使用QPanda 2，您会有更多的体验，更多详情可以阅读 使用文档_。话不多说，我们先从介绍Linux下的编译环境开始。
+    H(qs[i]);
 
-.. _使用文档: https://qpanda-2.readthedocs.io/zh_CN/latest/
+这一组语句是一个典型的for循环，但是执行这个程序的时机是在编译期间，因此这个for循环并不是在量子计算机中运行的for循环。它的效果相当于全部展开。即：
 
-**#### 编译环境**
+:: 
 
-在下载编译之前，我们需要：
+    H(q[0]);  
+    H(q[1]);  
+    H(q[2]);  
+    ...
 
-==================== ==========
-software              version        
-==================== ==========
-  GCC                 >= 5.4.0        
-  CMake               >= 3.1          
-  Python              >= 3.6.0        
-==================== ==========
-   
-**#### 下载和编译**
 
-我们需要在Linux终端下输入以下命令：
+2.1.3 经典类型 Classical Type
+++++++++++++++++++++++++++++++++
 
-- $ git clone https://github.com/OriginQ/QPanda-2.git
+经典类型是在量子测控系统中存在的对象。他们的创建、计算、管理都是由量子芯片的测控系统完成的。这个系统具有实时性的特点，因此这些变量的生命周期和qubit的退相干时间共存。它是为了解决普通的宿主机和量子芯片之间无法进行实时数据交换的问题而存在的。简而言之，它们介于宿主机（辅助类型）和量子芯片（量子类型）之间。
 
-- $ cd qpanda-2
+经典类型的变量典型地可以被用于保存量子比特的测量结果。除此之外，由测量结果决定的IF和WHILE操作，即后面会提到的QIF，QWHILE操作也是在测控系统中完成的，所以也属于经典类型。要注意到QIF和QWHILE和宿主机（辅助类型）的if，for，while等操作具有完全不同的运行时机，其中辅助类型的变量、表达式、语句等是编译期间计算的，经典类型是运行期间计算的。
 
-- $ mkdir build
+例如：
 
-- $ cd build
+::
 
-- $ cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. 
+    cbit c;  
+    qubit q;  
+    H(q);  
+    Measure(q,c);  
+    qif(c){  
+        // do something...  
+    }
 
-- $ make
+这个程序就根据一个qubit在执行完Hadamard门之后进行的测量的结果来选择执行分支。注意到c是一个在测控系统中存在的变量，而qif的判断也是在这个系统中实时完成的，之间与宿主机不会发生数据传输。
+
+经典变量之间还可以进行计算，比如：
+
+::
     
-**#### 安装**
+    qif(!c) {} // 对c求非  
+    qif(c1 == c2) {} //比较c1与c2的值  
+    qif(c1 == True) {} //等价于qif(c1) 
 
-编译完成后，安装就简单的多，只需要输入以下命令：
-
-- $ make install
-
-**#### 开始量子编程**
-
-现在我们来到最后一关，创建和编译自己的量子应用。
-我相信对于关心如何使用QPanda 2的朋友来说，如何创建C++项目，不需要我多说。不过，我还是需要提供CMakelist的示例，方便大家参考。
+但是经典辅助的if中是绝对不允许存在经典类型的变量的，原因是辅助类型的值是要求编译期间能够完全确定的，例如：
 
 ::
 
-        cmake_minimum_required(VERSION 3.1)
-        project(testQPanda)
-        SET(CMAKE_INSTALL_PREFIX "/usr/local")
-        SET(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX} lib/cmake")
-    
-        add_definitions("-std=c++14 -w -DGTEST_USE_OWN_TR1_TUPLE=1")
-        set(CMAKE_BUILD_TYPE "Release")
-        set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -g -ggdb")
-        set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3")
-        add_compile_options(-fPIC -fpermissive)
-        find_package(QPANDA REQUIRED)
-        if (QPANDA_FOUND)
-    
-            include_directories(${QPANDA_INCLUDE_DIR}
-                            ${THIRD_INCLUDE_DIR})
-            add_executable(${PROJECT_NAME} test.cpp)
-            target_link_libraries(${PROJECT_NAME} ${QPANDA_LIBRARIES})
-        endif (QPANDA_FOUND)
+    if(c) // Error：编译期间无法判断c的值
 
+2.2 常量
+------------
 
-我们接下来通过一个示例介绍QPanda 2的使用，此例子构造了一个量子叠加态。在量子程序中依次添加H门和CNOT门，最后对所有的量子比特进行测量操作。此时，将有50%的概率得到00或者11的测量结果。
+2.3 变量  
+------------
 
-::  
+变量的定义分为两个部分来说明：
 
-        #include "QPanda.h"
-        #include <stdio.h>
-        using namespace QPanda;
-        int main()
-        {
-            init(QMachineType::CPU);
-            QProg prog;
-            auto q = qAllocMany(2);
-            auto c = cAllocMany(2);
-            prog << H(q[0])
-                << CNOT(q[0],q[1])
-                << MeasureAll(q, c);
-            auto results = runWithConfiguration(prog, c, 1000);
-            for (auto result : results){
-                printf("%s : %d\n", result.first.c_str(), result.second);
-            }
-            finalize();
-        }
-    
-最后，编译，齐活。
-::
+1.形参变量
 
-        $ mkdir build
-        $ cd build
-        $ cmake .. 
-        $ make
-    
-运行结果如下:
-::
+形参变量，只做变量声明，由传递函数的实参进行初始化，作用域为所在函数体内，当函数结束的时候，形参即被销毁。
+形参变量的格式： 变量类型 变量名
+当前QRunes支持的形参变量类型有：
 
-        00 : 512
-        11 : 488 
+=============== ======================
+  int                Hamiltionian
+  float            variationalCircuit
+  double                  var
+  bool                 circuitGen
+  map
+  qubit  
+  cbit  
+  vector 
+=============== ======================
 
+2.变量
 
-**#### python的使用**
+在QRunes中变量的定义分为三部分来说明：
 
-pyQPanda只需要通过pip就可安装使用。
+a.量子类型的变量。
 
-- -pip install pyqpanda
-
-我们接下来通过一个示例介绍pyQPanda的使用，此例子构造了一个量子叠加态。在量子程序中依次添加H门和CNOT门，最后对所有的量子比特进行测量操作。此时，将有50%的概率得到00或者11的测量结果。
-::
-
-        from pyqpanda import *
-    
-        init(QMachineType.CPU)
-        prog = QProg()
-        q = qAlloc_many(2)
-        c = cAlloc_many(2)
-        prog.insert(H(q[0]))
-        prog.insert(CNOT(q[0],q[1]))
-        prog.insert(measure_all(q,c))
-        result = run_with_configuration(prog, cbit_list = c, shots = 1000)
-        print(result)
-        finalize()
-
-运行结果如下:
-::
-
-        {'00': 493, '11': 507}
-
-1.3 Qurator介绍  
---------------------
-
-1.4 初窥QRunes 
---------------------
-1.4.1 QRunes关键字 
-+++++++++++++++++++++++++
-
-1.4.2 QRunes程序结构  
-+++++++++++++++++++++++++
-
-**### QRunes由三部分组成**
-
-* #### settings 模块中可以设置宿主语言，编译还是运行；
+格式：量子类型 变量名
+比如：
 
 ::
 
-        @settings:
-            language = Python;
-            autoimport = True;
-            compile_only = False;
+    qubit q; => q = allocMany(1);  
+    vector<qubit> qvec;
 
-* #### qcodes 模块中可以编写 QRunes2 量子语言代码；
+b.经典辅助类型的变量。 
 
-::
+格式：let 变量名 = 初始值    
+在辅助类型中的let关键字作用是定义并初始化辅助类型的变量。（占位符也是自动类型推断）。  
+其中变量的类型由量子编译器根据初始值来推断确定变量的类型。  
+这样做的好处： 
 
-        D_J(qvec q,cvec c){
-            RX(q[1],Pi);
-            H(q[0]);
-            H(q[1]);
-            CNOT(q[0],q[1]);
-            H(q[0]);
-            Measure(q[0],c[0]);
-        }
-        
-* #### script 模块中可以编写宿主语言代码，目前支持 Python 和 C++ 两种宿主语言。
+1).简化量子编程的编程操作，并使代码简介。（凡是辅助类型的变量直接用let关键字来定义）    
+
+2).let关键字涉及的行为只在编译期间，而不是运行期间  
+
+注意：  
+
+1.let 关键字定义的变量必须有初始值。  
 
 ::
 
-        init(QuantumMachine_type.CPU_SINGLE_THREAD)
-        q = qAlloc_many(2)
-        c = cAlloc_many(2)
-        qprog1 = D_J(q,c)
-        result = directly_run(qprog1)
-        print(result)
-        finalize()
+    let a; //ERROR  
+    let a = 3.14; //CORRECT 
 
-1.4.3 Ops!你的第一个量子程序
--------------------------------
-点击右上方 Run this QRunes 运行程序，或者使用命令提示符 qurator-vscode: Run this QRunes 来运行程序(快捷键 F5)，点击运行结果可以以柱状图的的形式展示。
+2.函数参数不可以被声明为 let。 
 
-.. image::
-    ../images/run.gif
+::
 
-**##### 小结**
+    ker(qubit q,let a){ //ERROR  
+        ...  
+    }  
+
+3.let不能与其他类型组合连用。
+
+::
+
+    let int a = 0.09; //ERROR  
+
+4.定义一个let关键字序列的对象的变量，其所有初始值必须为最终能推导为同一类型。  
+
+::
+
+    let a = 0.09, b = false, c =10; //ERROR  
+    let a = 0.09, b = 3.14, c=100.901; //CORRECT  
+
+c.经典类型的变量。
+
+格式：经典类型 变量名  
+比如：
+
+::
+
+    cbit c;  
