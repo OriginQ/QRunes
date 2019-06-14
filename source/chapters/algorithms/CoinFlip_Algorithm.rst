@@ -19,7 +19,7 @@
         compile_only = False;
         
     @qcodes:
-    CoinFlip_Algorithm(qvec q, cvec c, bool fx) {
+    CoinFlip_Algorithm(vector<qubit> q, vector<cbit> c, bool fx) {
         X(q[0]);
         H(q[0]);
         X(q[1]);

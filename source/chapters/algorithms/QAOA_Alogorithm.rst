@@ -27,9 +27,9 @@
         compile_only = False;
         
     @qcodes:
-    variationalCircuit oneCircuit(qvec qlist, hamiltonian hp, var beta, var gamma){
+    variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, var beta, var gamma){
         for(int i = 0: 1: hp.size()){ 
-            qvec tmp_vec;
+            vector<qubit> tmp_vec;
             let item = hp[i];
             map dict_p = item.getFirst();
             for(map m in dict_p) {

@@ -20,7 +20,7 @@
         compile_only = False;
         
     @qcodes:
-    BV_QProg(qvec q, cvec c, bvec a, bool b) {
+    BV_QProg(vector<qubit> q, vector<cbit> c, vector<bool> a, bool b) {
         let length = q.size();
         X(q[length - 1]);
         for (let i=0: 1: length) {

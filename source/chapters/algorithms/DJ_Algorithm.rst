@@ -30,7 +30,7 @@ Deutsch–Jozsa算法是一种经过设计的情况，它证明了量子算法�
         compile_only = False;
         
     @qcodes:
-    Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, bvec oracle_function) {
+    Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, vector<bool> oracle_function) {
         H(q1);
         H(q2);
         // Perform Hadamard gate on all qubits

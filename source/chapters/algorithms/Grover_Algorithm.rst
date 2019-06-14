@@ -19,47 +19,33 @@
         compile_only = False;
         
     @qcodes:
-    Grover(qvec q, cvec c, int target) {
-        qvec controlVector;
-        controlVector.add(q[0]);
-        controlVector.add(q[1]);
-        H(q[0]);
-        H(q[1]);
-        X(q[2]);
-        H(q[2]);
-        
-        if (target == 0) {
-            X(q[0]);
-            X(q[1]);
-            X(q[2]).control(controlVector);
-            X(q[0]);
-            X(q[1]);
-        } else if (target == 1) {
-            X(q[0]);
-            X(q[2]).control(controlVector);
-            X(q[0]);
-        } else if (target == 2) {
-            X(q[1]);
-            X(q[2]).control(controlVector);
-            X(q[1]);
-        } else if (target == 3) {
-            X(q[2]).control(controlVector);
+    QCircuit diffusion(vector<qubit> q){
+        vector<qubit> q1;
+        for (int i=1: 1: len(q)){
+            q1.add(q[i]);
         }
-    
-        H(q[0]);
-        H(q[1]);
-        X(q[0]);
-        X(q[1]);
-        H(q[1]);
-        CNOT(q[0], q[1]);
-        H(q[1]);
-        X(q[0]);
-        X(q[1]);
-        H(q[0]);
-        H(q[1]);
-        X(q[2]);
-        Measure(q[0], c[0]);
-        Measure(q[1], c[1]);
+        for (let i=0: 1: len(q)){
+            H(q);
+        }
+        Z(q[0]).control(q1);
+        for (let i=0: 1: len(q)){
+            H(q);
+        }
+    }
+
+    Grover(vector<qubit> q, qubit qa, cbit c, int repeat, circuit<vector<qubit>, qubit> oracle){
+        X(qa);
+        for (let i = 0: 1: len(q)){
+            H(q);
+        }
+        H(qa);
+        for (let i = 0: 1: repeat){
+            oracle(q,qa);
+            diffusion(q);
+        }    
+        for (let i = 0: 1: len(q)){
+            Measure(q[i], c[i]);
+        }
     }
     
     @script:
@@ -73,10 +59,11 @@
         init(QMachineType.CPU_SINGLE_THREAD)
     
         qubit_num = 3
-        cbit_num = 2
         qv = qAlloc_many(qubit_num)
-        cv = cAlloc_many(cbit_num)
-        groverprog = Grover(qv, cv, target)
+        q = qAlloc()
+        c = cAlloc()
+        repeat = 100
+        groverprog = Grover(qv, q, c, repeat, oracle)
         resultMap = directly_run(groverprog)
         if resultMap['c0']:
             if resultMap['c1']:

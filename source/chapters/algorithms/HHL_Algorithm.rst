@@ -11,11 +11,17 @@ HHL算法的输入和输出:
 - 输入：一个n*n的矩阵A和一个n维向量b， 
 
 - 输出：n维向量x，满足Ax=b。
+
+.. image::
+        ../../images/hhl_1.png
     
 HHL的限制条件：
 
 1. 输入的矩阵，必须是adjoint矩阵，当A不是Hermitian时，需要构造成adjoint矩阵。算法的输入部分如图1中红色方框所标出。输入q[2]存放在底部寄存器中，输入A作为相位估计中酉算子的一个组成部分。
 2. 输出x的形式：算法的输出如红色部分标出（同一个寄存器）。底部寄存器存放的是一个蕴含了向量x的量子态。 此处不需要知道这个状态具体情况。
+
+.. image::
+        ../../images/hhl_2.png
 
 6.4.2 HHL算法的实现 
 ---------------------
@@ -30,8 +36,8 @@ HHL的限制条件：
         compile_only = False;
 
     @qcodes:
-    QCircuit CRotate(qvec q) {
-        qvec controlVector;
+    QCircuit CRotate(vector<qubit> q) {
+        vector<qubit> controlVector;
         controlVector.add(q[1]);
         controlVector.add(q[2]);
         X(q[1]);
@@ -43,7 +49,7 @@ HHL的限制条件：
         RY(q[0], 0.679673818908).control(controlVector);  //arcsin(1/3)
     }
 
-    QCircuit hhlPse(qvec q) {
+    QCircuit hhlPse(vector<qubit> q) {
         // create superposition
         H(q[1]);
         H(q[2]);
@@ -61,7 +67,7 @@ HHL的限制条件：
         H(q[1]);
     }
 
-    hhl_no_measure(qvec q, cvec c) {
+    hhl_no_measure(vector<qubit> q, vector<cbit> c) {
         hhlPse(q);
         CRotate(q);
         Measure(q[0], c[0]);

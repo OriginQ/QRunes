@@ -19,9 +19,9 @@
         compile_only = False;
         
     @qcodes:
-    QCircuit controlfunc(qvec q, int index, int value) {
+    QCircuit controlfunc(vector<qubit> q, int index, int value) {
         let length = q.size() / 2;
-        qvec qvtemp;
+        vector<qubit> qvtemp;
         qvtemp.insert(q, 0, length);
         if (index == 1) {
             X(q[0]);
@@ -52,7 +52,7 @@
     }
     
     //f(x),x is 2bits variable
-    QCircuit oraclefunc(qvec q, ivec funvalue) {
+    QCircuit oraclefunc(vector<qubit> q, vector<int> funvalue) {
         let length = q.size()/2;
         for (let i=0: 1: 4){
             let value = funvalue[i];
@@ -60,7 +60,7 @@
         }
     }
     
-    Simon_QProg(qvec q, cvec c, ivec funvalue) {
+    Simon_QProg(vector<qubit> q, cvec c, vector<int> funvalue) {
         let length = c.size();
         for (let i=0: 1: length) {
             H(q[i]);

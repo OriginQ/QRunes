@@ -22,8 +22,8 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
         compile_only = False;
         
     @qcodes:
-    QCircuit addOne(qvec q) {
-        qvec vControlQubit;
+    QCircuit addOne(vector<qubit> q) {
+        vector<qubit> vControlQubit;
         vControlQubit.insert(q, 1, q.size()-1);
         for (let i=0: 1: q.size()) {
             X(q[i]).control(vControlQubit);
@@ -33,17 +33,17 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
         }
     }
     
-    QCircuit walkOneStep(qvec q) {
+    QCircuit walkOneStep(vector<qubit> q) {
         let iLength = q.size();
         X(q[iLength-1]);
-        qvec vCQubit;
+        vector<qubit> vCQubit;
         vCQubit.insert(q, 1, q.size());
         addOne(q);
         X(q[iLength-1]);
         addOne(q).dagger();
     }
     
-    quantumWalk(qvec q, cvec c) {  
+    quantumWalk(vector<qubit> q, vector<cbit> c) {  
         let length = q.size();
         X(q[length-2]);
         X(q[length-2]);

@@ -13,3 +13,4 @@
    algorithms/CoinFlip_Algorithm
    algorithms/Bernstein-Vazirani_Algorithm
    algorithms/QPE_Algorithm
+   algorithms/shor_Algorithm
