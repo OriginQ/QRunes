@@ -107,17 +107,17 @@
 ::
 
     Reset_Qubit_Circuit(qubit q, cbit c, bool setVal) {  
-    Measure(q, c);  
-    if (setVal == False) {  
-        qif (c) {  
-            X(q);  
-        }  
-    } else {  
-        qif (c) {  
-        } qelse {  
-            X(q);  
-        }  
-    }   
+        Measure(q, c);  
+        if (setVal == False) {  
+            qif (c) {  
+                X(q);  
+            }  
+        } else {  
+            qif (c) {  
+            } qelse {  
+                X(q);  
+            }  
+        }   
     }  
     Reset_Qubit(qubit q, cbit c, bool setVal) {     
     // quantum logic gate function call,and can reference to its function definition  

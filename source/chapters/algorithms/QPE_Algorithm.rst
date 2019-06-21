@@ -20,6 +20,7 @@ QPE算法（Quantum Phase Estimation），量子相位估计算法。该算法�
         compile_only = False;
         
     @qcodes:
+    // Perform Fourier Transform
     QCircuit QFT(vector<qubit> q) {
         for(let i=0: 1: q.size()) {
             H(q[q.size()-1-i]);
@@ -52,6 +53,7 @@ QPE算法（Quantum Phase Estimation），量子相位估计算法。该算法�
         }
     }
 
+    // Applying a controlled single operation
     QCircuit controlUnitaryPower(vector<qubit> q, qubit controlQubit, int min, circuitGen qc) {
         vector<qubit> cControlQubit;
         cControlQubit.add(controlQubit);
@@ -59,6 +61,7 @@ QPE算法（Quantum Phase Estimation），量子相位估计算法。该算法�
     }
 
     QCircuit QPE(vector<qubit> controlqvec, vector<qubit> targetqvec, circuitGen qc) {
+        // A unified H-gate operation is added to controlqvec qubits, and N initial states are placed in superposition states.
         for(let i=0: 1: controlqvec.size()) {
             H(controlqvec[i]);
         }
@@ -75,7 +78,9 @@ QPE算法（Quantum Phase Estimation），量子相位估计算法。该算法�
 
         qubit_num = 2
         cbit_num = 2
-        cqv = qAlloc_many(qubit_num)   
+        # Initialization 2 quantum bits
+        cqv = qAlloc_many(qubit_num) 
+        # Initialization 1 quantum bits    
         tqv = qAlloc_many(1)
         cv = cAlloc_many(cbit_num)
         qpeProg = QProg()

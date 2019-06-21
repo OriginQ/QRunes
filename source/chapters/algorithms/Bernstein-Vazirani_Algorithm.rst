@@ -20,6 +20,7 @@
         compile_only = False;
         
     @qcodes:
+    // Hadamard gate operation and CNOT gate operation for a+1 qubit
     BV_QProg(vector<qubit> q, vector<cbit> c, vector<bool> a, bool b) {
         let length = q.size();
         X(q[length - 1]);
@@ -59,6 +60,7 @@
         init(QMachineType.CPU_SINGLE_THREAD)
         qubit_num = len(a)
         cbit_num = qubit_num
+        # Initialization quantum bits
         qv = qAlloc_many(qubit_num+1)
         cv = cAlloc_many(cbit_num)
         

@@ -48,12 +48,12 @@ HHL的限制条件：
         X(q[2]);
         RY(q[0], 0.679673818908).control(controlVector);  //arcsin(1/3)
     }
-
+    
+    //Phase estimation algorithms
     QCircuit hhlPse(vector<qubit> q) {
-        // create superposition
+     
         H(q[1]);
         H(q[2]);
-
         RZ(q[2], 0.75Pi);
         CU(Pi, 1.5Pi, -0.5Pi, Pi/2, q[2], q[3]);
         RZ(q[1], 1.5Pi);
@@ -62,13 +62,16 @@ HHL的限制条件：
         CNOT(q[1], q[2]);
         CNOT(q[2], q[1]);
         CNOT(q[1], q[2]);
+
         H(q[2]);
         CU(-0.25Pi, -0.5*Pi, 0, 0, q[2], q[1]);
         H(q[1]);
     }
 
     hhl_no_measure(vector<qubit> q, vector<cbit> c) {
+        //phase estimation
         hhlPse(q);
+        //rotate
         CRotate(q);
         Measure(q[0], c[0]);
         qif (c[0]) {

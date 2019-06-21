@@ -42,7 +42,8 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
         X(q[iLength-1]);
         addOne(q).dagger();
     }
-    
+
+    //continuous quantum walks,consists of a walker and an evolution operator.
     quantumWalk(vector<qubit> q, vector<cbit> c) {  
         let length = q.size();
         X(q[length-2]);

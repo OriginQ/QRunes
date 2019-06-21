@@ -34,7 +34,7 @@
     QCircuit UMA(qubit a, qubit b, qubit c) {
         Toffoli(a, b, c);
         CNOT(c, a);
-        CNOT(c, b);
+        CNOT(a, b);
     }
 
     //Quantum adder MAJ2 module
@@ -109,7 +109,7 @@
 
         X(qs1[0]);
 
-        tmpValue = (1 << qNum) - C
+        tmpValue = (1 << qNum) - C;
         bindData(qb, tmpValue);
         isCarry(qa, qb, qs1[1], qs1[0]);
         bindData(qb, tmpValue);

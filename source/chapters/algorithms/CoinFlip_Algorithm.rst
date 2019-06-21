@@ -19,12 +19,14 @@
         compile_only = False;
         
     @qcodes:
+    // Determine whether the next step needs to be performed based on the classical output information
     CoinFlip_Algorithm(vector<qubit> q, vector<cbit> c, bool fx) {
         X(q[0]);
         H(q[0]);
         X(q[1]);
         CNOT(q[0], q[1]);
         H(q[1]);
+        // If the output is 0, then the corresponding operation is needed later.
         if (fx) {
             X(q[0]);
         }
@@ -52,6 +54,7 @@
     
         qubit_num = 2
         cbit_num = 2
+        # Initialization of 2 quantum bits
         qv = qAlloc_many(qubit_num)
         cv = cAlloc_many(cbit_num)
         out_come = 0

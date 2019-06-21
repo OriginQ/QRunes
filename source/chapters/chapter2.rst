@@ -22,9 +22,9 @@
 
 ::
 
-    for (i = 0: qs.size())  
-
-    H(qs[i]);
+    for (i = 0: 1: qs.size()) {
+        H(qs[i]);
+    }
 
 这一组语句是一个典型的for循环，但是执行这个程序的时机是在编译期间，因此这个for循环并不是在量子计算机中运行的for循环。它的效果相当于全部展开。即：
 
@@ -69,10 +69,12 @@
 
 ::
 
-    if(c) // Error：编译期间无法判断c的值
+    if(c) {} // Error：编译期间无法判断c的值
 
 2.2 常量
 ------------
+
+目前QRune包含的常量有：Pi，默认值为 3.14159265358979。
 
 2.3 变量  
 ------------
@@ -87,14 +89,34 @@
 
 =============== ======================
   int                Hamiltionian
-  float            variationalCircuit
-  double                  var
-  bool                 circuitGen
-  map
-  qubit  
+  double                 avar
+  bool                  circuit
+  map                 callback_type
+  qubit              
   cbit  
-  vector 
+  vector_type
 =============== ======================
+
+vector_type是数组类型的数据，具体的参数类型需要在泛型中确定。
+例如：vector<qubit>表示qubit类型的数组。
+
+callback_type是回调函数类型，由 返回类型<参数> 组成。
+例如：
+
+::
+
+    circuit unitary(vector<qubit> q) {
+        RX(q[0], -Pi);
+    }
+
+    //qc为返回类型为circuit类型，参数类型为vector<qubit>的回调函数类型
+    circuit unitarypower(vector<qubit> q, int min, circuit<vector<qubit>> qc) { 
+        for (let i=0: 1: (1 << min)) {
+            qc(q);
+        }
+    }
+    
+    unitarypower(q, min, unitary)  //函数的调用，callback参数类型只需传入所需调用的函数名
 
 2.变量
 
@@ -119,7 +141,7 @@ b.经典辅助类型的变量。
 
 1).简化量子编程的编程操作，并使代码简介。（凡是辅助类型的变量直接用let关键字来定义）    
 
-2).let关键字涉及的行为只在编译期间，而不是运行期间  
+2).let关键字涉及的行为只在编译期间，而不是运行期间。  
 
 注意：  
 
@@ -134,7 +156,7 @@ b.经典辅助类型的变量。
 
 ::
 
-    ker(qubit q,let a){ //ERROR  
+    ker(qubit q, let a){ //ERROR  
         ...  
     }  
 

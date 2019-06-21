@@ -27,6 +27,7 @@
         compile_only = False;
         
     @qcodes:
+    //Solving the problem of Maximum Cutting
     variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, var beta, var gamma){
         for(int i = 0: 1: hp.size()){ 
             vector<qubit> tmp_vec;
@@ -50,6 +51,7 @@
     @script:
     import numpy as np
 
+    #Convert the data format to be processed
     def trans(friendShip):
         pro = {}
         for i in range(len(friendShip)):
@@ -64,28 +66,32 @@
         print("what we r need to handle:")
         print(firendShip)
         problem = trans(firendShip)
+
+        #Bulid pauli operator base on the data of problem
         Hp = PauliOperator(problem)
         qubit_num = Hp.getMaxIndex()
 
         machine = init_quantum_machine(QMachineType.CPU_SINGLE_THREAD)
         qlist = machine.qAlloc_many(qubit_num)
-
         step = 4
-
         beta = var(np.ones((step,1), dtype = 'float64'), True)
         gamma = var(np.ones((step,1), dtype = 'float64'), True)
-
+       
+        #Create a variable quantum circuit
         vqc = VariationalQuantumCircuit()
 
+        #Insert Hadamard gates to each qubit as initial condition
         for i in qlist:
             vqc.insert(VariationalQuantumGate_H(i))
 
+        #Insert quantum circuits corresponding to each step according to the step size
         for i in range(step):    
             vqc.insert(oneCircuit(qlist, Hp.toHamiltonian(1), beta[i], gamma[i]))
 
+        #Calculate loss variables
         loss = qop(vqc, Hp, machine, qlist)  
+        #Use momentum-based optimizer and get result variables
         optimizer = MomentumOptimizer.minimize(loss, 0.02, 0.9)
-
         leaves = optimizer.get_variables()
 
         for i in range(100):
@@ -96,6 +102,7 @@
         prog = QProg()
         qcir = vqc.feed()
         prog.insert(qcir)
+        #Run quantum programs
         directly_run(prog)
 
         result = quick_measure(qlist, 100)

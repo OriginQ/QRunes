@@ -19,6 +19,8 @@
         compile_only = False;
         
     @qcodes:
+    //CNOT operations are performed on q[0]、q[2] and q[1]、 q[2], respectively
+    //Perform NOT operations on q[3]
     QCircuit controlfunc(vector<qubit> q, int index, int value) {
         let length = q.size() / 2;
         vector<qubit> qvtemp;
@@ -62,13 +64,16 @@
     
     Simon_QProg(vector<qubit> q, cvec c, vector<int> funvalue) {
         let length = c.size();
+        // q[0]、q[1] Do the Hadamard operation separately
         for (let i=0: 1: length) {
             H(q[i]);
         }
         oraclefunc(q, funvalue);
+        //Then Hadamard operations are performed on q[0]、q[1], respectively.
         for (let i=0: 1: length) {
             H(q[i]);
         }
+        //Finally, all quantum logic bits are measured and the output results are obtained.
         for (let i=0: 1: length) {
             Measure(q[i], c[i]);
         }
@@ -93,6 +98,7 @@
         init(QMachineType.CPU_SINGLE_THREAD)
         qubit_num = 4
         cbit_num = 2
+        # Initialization of 4 quantum bits
         qv = qAlloc_many(qubit_num)
         cv = cAlloc_many(cbit_num)
         simonAlgorithm = Simon_QProg(qv, cv, func_value)

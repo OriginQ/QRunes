@@ -17,7 +17,7 @@
 
 ::
 
- qcircuit createCircuit(qubit qu);
+ circuit createCircuit(qubit qu);
 
 返回值，函数名和函数形参列表称为函数原型。函数的声明为定义函数的使用者和调用函数的使用者之间提供了一种天然的接口。
 
@@ -59,7 +59,7 @@ QRunes中函数的返回类型可以是内置类型、复合类型也可以是vo
 ::
 
  qprog  
- qcircuit  
+ circuit  
  variationalCircuit  
  qubit  
  cbit  
