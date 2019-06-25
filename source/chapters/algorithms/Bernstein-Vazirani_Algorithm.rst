@@ -10,6 +10,120 @@
 6.8.2 Bernstein-Vazirani算法的实现
 -------------------------------------
 
+问题描述：
+************
+
+| Input:
+| 考虑一个经典的布尔函数：
+
+.. math:: f:\{0,1\}^n→\{0,1\}
+
+| 存在 :math:`s∈\{0,1\}^n` ，再定义一个函数：
+
+.. math:: f_s (x)=〈s,x〉  ,x∈\{0,1\}^n
+
+| s是一个未知的向量，通常称s为隐藏字符串（Hidden string），其中 :math:`〈s,x〉` 表示内积（inner product），定义为：
+
+.. math:: 〈s,x〉=s_0 x_0⊕s_1 x_1⊕…⊕s_n x_n
+
+| 符号 :math:`⊕` 在所出现的量子算法文中都表示布尔加或模2加。）
+| Output：
+| 算法目标：找到s.
+
+经典算法情况：
+***************
+
+由于对该函数的每个经典查询只能生成1位的信息, 而任意隐藏字符串 s 具有n位的信息, 所以经典查询复杂性是  :math:`O(n)` 。
+
+量子算法情况：
+**************
+
+Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探索量子查询复杂度。他们对该领域的贡献是一个用于隐藏字符串问题的量子算法, 该算法的非递归量子查询复杂度仅为1，同比经典情况 :math:`O(n)` 。这一量子算法的真正突破在于加快查询复杂度, 而不是执行时间本身。
+
+案例：考虑n=3时的Bernstein-Vazirani问题。变量是3比特时，二进制表示为  :math:`x_0 x_1 x_2` ，常数s则表示为 :math:`s_0 s_1 s_2` ，因此所求的常数s总共有8个。此时，问题函数描述如下：
+
+.. math:: f_s (x_0 x_1 x_2 )=s_0 x_0⊕s_1 x_1⊕s_2 x_2 
+
+不难看出，对于经典算法而言，如果是 :math:`f_s (100)=s_0` ,  :math:`f_s (010)=s_1` , :math:`f_s (001)=s_2` ，那么最少也需要3次调用函数才可以确定常量 :math:`s=s_0 s_1 s_2` 。但是对于量子算法而言，使用下面的量子Oracle计算，1次就可以决定 :math:`s=s_0 s_1 s_2` ，其计算复杂度为 :math:`O(1)` 。
+ 
+.. image::
+        ../../images/bva_1.jpg
+
+| 分析上图:
+
+.. math:: |000⟩|1⟩\xrightarrow[]{H⨂H⨂H⨂H}\frac{2}{2\sqrt{2}}\sum_{x=0}^{7}{|x⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}}\right )}\\
+    \xrightarrow[]{U_f }\frac{1}{2\sqrt{2}}\sum_{x=0}^{7}{\left ( -1 \right )^\left \langle s,x\right \rangle\:   |x⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}} \right )}\\
+    \xrightarrow[]{H⨂H⨂H⨂H}\frac{2}{2\sqrt{2}}\sum_{x=0,y=0}^{7}{\left ( -1 \right )^{\left \langle s,x\right \rangle ⨂\left \langle x,y\right \rangle}\; \;    |y⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}} \right )\equiv|s⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}} \right ) }
+    
+| 不失一般性：
+
+.. math:: |0⟩^n|1⟩\xrightarrow[]{H^{⨂(n+1)}}\frac{1}{\sqrt{2^n}}\sum_{x=0}^{2^n-1}{|x⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}}\right )}\\
+    \xrightarrow[]{U_f }\frac{1}{\sqrt{2^n}}\sum_{x=0}^{2^n-1}{\left ( -1 \right )^\left \langle s,x\right \rangle\:   |x⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}} \right )}\\
+    \xrightarrow[]{H^{⨂(n+1)}}\frac{1}{\sqrt{2^n}}\sum_{x=0}^{2^n-1}{\left ( -1 \right )^{\left \langle s,x\right \rangle ⨂\left \langle x,y\right \rangle}\; \;    |y⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}} \right )\equiv|s⟩⨂\left ( \frac{|0⟩-|1⟩}{\sqrt{2}} \right ) }
+
+ 
+参考线路图：
+************
+
+| 下面给出两组案例,分别是s=101和s=111
+| s=101
+
+.. image::
+        ../../images/bva_6.jpg
+ 
+| QRunes :
+
+::
+
+    RX 3,"pi"
+    H 0
+    H 1
+    H 2
+    H 3
+    CNOT 0,3
+    CNOT 2,3
+    H 0
+    H 1
+    H 2
+    MEASURE 0,$0
+    MEASURE 1,$1
+    MEASURE 2,$2
+
+这时，输出的结果，指代了s。通过验证,输出结果为：
+
+.. image::
+        ../../images/bva_7.jpg
+
+| s=111时：
+| 线路图设计为：
+
+.. image::
+        ../../images/bva_8.jpg
+ 
+测量结果：
+
+.. image::
+        ../../images/bva_9.jpg
+ 
+| QRunes :
+
+::
+
+    RX 3,"pi"
+    H 0
+    H 1
+    H 2
+    H 3
+    CNOT 0,3
+    CNOT 1,3
+    CNOT 2,3
+    H 0
+    H 1
+    H 2
+    MEASURE 0,$0
+    MEASURE 1,$1
+    MEASURE 2,$2
+
 下面给出 QRunes 实现 Bernstein-Vazirani 算法的代码示例：
 
 ::
