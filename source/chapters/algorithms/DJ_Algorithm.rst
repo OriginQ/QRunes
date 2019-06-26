@@ -62,85 +62,78 @@ Deutsch–Jozsa算法是一种经过设计的情况，它证明了量子算法�
 ::
 
     @settings:
-        language = Python;
-        autoimport = True;
-        compile_only = False;
-        
+    language = Python;
+    autoimport = True;
+    compile_only = False;
+
     @qcodes:
-    Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, vector<bool> oracle_function) {
-        H(q1);
-        H(q2);
-        // Perform Hadamard gate on all qubits
-        if (oracle_function[0] == False && oracle_function[1] == True) {
-            // f(x) = x;
-            CNOT(q1, q2);
-        } else if (oracle_function[0] == True && oracle_function[1] == False) {
-            // f(x) = x + 1;
-            X(q2);
-            CNOT(q1, q2);
-            X(q2);
-        } else if (oracle_function[0] == True && oracle_function[1] == True) {
-            // f(x) = 1
-            X(q2);
-        } else {
-            // f(x) = 0, do nothing  
-        }
-        // Finally, Hadamard the first qubit and measure it
-        H(q1);
-        Measure(q1, c);
-    }
-    
-    Reset_Qubit_Circuit(qubit q, cbit c, bool setVal) {
-        Measure(q, c);
-        if (setVal == False) {
-            qif (c) {
-                X(q);
+    circuit<vector<qubit>,qubit> generate_two_qubit_oracle(vector<bool> oracle_function){
+        return lambda (vector<qubit> qlist,qubit qubit2):{
+            if (oracle_function[0] == false &&
+                oracle_function[1] == true)
+            {
+                // f(x) = x;
+                CNOT(qlist[0], qubit2);
             }
-        } else {
-            qif (c) {
-            } qelse {
-                X(q);
+            else if (oracle_function[0] == true &&
+                oracle_function[1] == false)
+            {
+                // f(x) = x + 1;
+                CNOT(qlist[0], qubit2);
+                X(qubit2);
             }
-        } 
+            else if (oracle_function[0] == true &&
+                oracle_function[1] == true)
+            {
+                // f(x) = 1
+                X(qubit2);
+            }
+            else
+            {
+                // f(x) = 0, do nothing  
+            }
+        };
     }
-    
-    Reset_Qubit(qubit q, cbit c, bool setVal) {
-        Reset_Qubit_Circuit(q, c, setVal);
+
+    Deutsch_Jozsa_algorithm(vector<qubit> qlist,qubit qubit2,vector<cbit> clist,circuit<vector<qubit>,qubit> oracle){
+        X(qubit);
+        apply_QGate(qlist, H);
+        H(qubit2);
+        oracle(qlist,qubit2);
+        apply_QGate(qlist, H);
+        measure_all(qlist,clist);
     }
-        
+
     @script:
-    import sys
-    def DJ_Algorithm(qv, c):
-        if len(qv) != 2:
-            print('error: qvec size error，the size of qvec must be 2')
-            sys.exit(1)
-        print('input the input function')
-        print('The function has a boolean input')
-        print('and has a boolean output')
-        fx0 = int(input('f(0)= (0/1)?\n'))
-        fx1 = int(input('f(1)= (0/1)?\n'))
-        oracle_function = [fx0, fx1]
-        print('Programming the circuit... ')
-        cbit = cAlloc()
-        Reset_Qubit(qv[0], cbit, False)
-        Reset_Qubit(qv[1], cbit, True)
-        prog = Two_Qubit_DJ_Algorithm_Circuit(qv[0], qv[1], c, oracle_function)
-        return prog
-    
-    if __name__ == '__main__':
+    def two_qubit_deutsch_jozsa_algorithm(boolean_function):
         init(QMachineType.CPU_SINGLE_THREAD)
-        
         qubit_num = 2
-        qv = qAlloc_many(qubit_num)
-        c = cAlloc()
-        prog = DJ_Algorithm(qv, c)
+        cbit_num = 1
+        qvec = qAlloc_many(qubit_num)
+        cvec = cAlloc_many(cbit_num)
+        oracle = generate_two_qubit_oracle(boolean_function)
+        prog = Deutsch_Jozsa_algorithm([qvec[0]],qvec[1],[cvec[0]],oracle)
         result = directly_run(prog)
-        if result["c0"] == False:
-            print('Constant function!')
-        elif result["c0"] == True:
-            print('Balanced function!')
-    
+        if cvec[0].eval() == False:
+            print("Constant function!")
+        elif cvec[0].eval() == True:
+            print("Balanced function!")
         finalize()
+
+
+    if __name__ == '__main__':
+        fx0 = 0
+        fx1 = 1
+        print("input the input function")
+        print("The function has a boolean input")
+        print("and has a boolean output")
+        print("f(0)= (0/1)?")
+        fx0 = input()
+        print("f(1)=(0/1)?")
+        fx1 = input()
+        oracle_function = [fx0,fx1]
+        print("Programming the circuit...")
+        two_qubit_deutsch_jozsa_algorithm(oracle_function)
 
 6.2.3 Deutsch–Jozsa算法小结
 -------------------------------
