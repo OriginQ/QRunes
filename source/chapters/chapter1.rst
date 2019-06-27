@@ -253,6 +253,6 @@ qurator-vscode 插件提供图形化的结果展示，程序运行后会展示 j
 点击右上方 Run this QRunes 运行程序，或者使用命令提示符 qurator-vscode: Run this QRunes 来运行程序(快捷键 F5)，点击运行结果可以以柱状图的的形式展示。
 
 .. image::
-    ../images/run.gif
+    ../images/run.jpg
 
 **##### 小结**
