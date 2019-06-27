@@ -100,69 +100,93 @@
 ::
 
     @settings:
-        language = Python;
-        autoimport = True;
-        compile_only = False;
-        
+    language = Python;
+    autoimport = True;
+    compile_only = False;
+
     @qcodes:
-    QCircuit diffusion(vector<qubit> q){
-        vector<qubit> q1;
-        for (int i=1: 1: len(q)){
-            q1.add(q[i]);
-        }
-        for (let i=0: 1: len(q)){
-            H(q);
-        }
-        Z(q[0]).control(q1);
-        for (let i=0: 1: len(q)){
-            H(q);
-        }
+    circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int arget){
+        return lambda (vector<qubit> qvec,qubit qu):{
+            if(target == 0){
+                X(qvec[0]);
+                X(qvec[1]);
+                Toffoli(qvec[0], qvec[1], qu);
+                X(qvec[0]);
+                X(qvec[1]);
+            }
+            if(target == 1){
+                X(qvec[0]);
+                Toffoli(qvec[0], qvec[1], qu);
+                X(qvec[0]);
+            }
+            if(target == 2){
+                X(qvec[1]);
+                Toffoli(qvec[0], qvec[1], qu);
+                X(qvec[1]);
+            }
+            if(target == 3){
+                Toffoli(qvec[0], qvec[1], qu);
+            }
+        };
     }
 
-    Grover(vector<qubit> q, qubit qa, cbit c, int repeat, circuit<vector<qubit>, qubit> oracle){
-        X(qa);
-        for (let i = 0: 1: len(q)){
+    circuit diffusion_operator(vector<qubit> qvec){
+        vector<qubit> controller;
+        controller = qvec[0:qvec.leng()-1];
+        for (qubit q in qvec)
             H(q);
-        }
-        H(qa);
-        for (let i = 0: 1: repeat){
-            oracle(q,qa);
-            diffusion(q);
-        }    
-        for (let i = 0: 1: len(q)){
-            Measure(q[i], c[i]);
-        }
+        for (qubit q in qvec)
+            X(q);
+        Z(qvec[qvec.length()-1]).control(controller);
+        for (qubit q in qvec)
+            X(q);
+        for (qubit q in qvec)
+            H(q);
     }
-    
+
     @script:
     if __name__ == '__main__':
-        print('input the input function')
-        print('The function has a boolean input')
-        print('and has a boolean output')
-        target = int(input('target=(0/1/2/3)?\n'))
-        print('Programming the circuit...')
-    
-        init(QMachineType.CPU_SINGLE_THREAD)
-    
-        qubit_num = 3
-        qv = qAlloc_many(qubit_num)
-        q = qAlloc()
-        c = cAlloc()
-        repeat = 100
-        groverprog = Grover(qv, q, c, repeat, oracle)
-        resultMap = directly_run(groverprog)
-        if resultMap['c0']:
-            if resultMap['c1']:
-                print('target number is 3 !')
+        condition = 1
+        while condition == 1:
+            print("input the input function")
+            print("The function has a boolean input")
+            print("and has a boolean output")
+            print("target=(0/1/2/3)?")
+            target = int(input())
+            print("Programming the circuit...")
+            oracle = generate_3_qubit_oracle(target)
+
+            qvm = init_quantum_machine(QMachineType.CPU_SINGLE_THREAD)
+
+            qubit_number = 3
+
+            working_qubit = qvm.qAlloc_many(qubit_number-1)
+            
+            ancilla = qvm.qAlloc()
+
+            cbitnum = 2
+            cvec = qvm.cAlloc_many(cbitnum);
+            
+            repeate = 1
+            
+            prog = Grover_algorithm(working_qubit, ancilla, cvec, oracle, repeate)
+
+            # To Print The Circuit
+            print(to_QRunes(prog, qvm))
+
+            resultMap = directly_run(prog)
+            
+            if resultMap["c0"]:
+                if resultMap["c1"]:
+                    print("target number is 3 !")
+                else:
+                    print("target number is 2 !")
             else:
-                print('target number is 2 !')
-        else:
-            if resultMap["c1"]:
-                print("target number is 1 !")
-            else:
-                print("target number is 0 !")
-        
-        finalize()
+                if resultMap["c1"]:
+                    print("target number is 1 !")
+                else:
+                    print("target number is 0 !")
+            destroy_quantum_machine(qvm)
 
 6.3.3 Grover算法小结
 -----------------------

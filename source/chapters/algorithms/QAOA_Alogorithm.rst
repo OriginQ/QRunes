@@ -187,7 +187,7 @@ QPanda::QAOA利用经典量子混合方法，称为quantum-variational-eigensolv
         
     @qcodes:
     //Solving the problem of Maximum Cutting
-    variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, var beta, var gamma){
+    variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, avar beta, avar gamma){
         for(int i = 0: 1: hp.size()){ 
             vector<qubit> tmp_vec;
             let item = hp[i];
@@ -197,9 +197,9 @@ QPanda::QAOA利用经典量子混合方法，称为quantum-variational-eigensolv
             }
 
             let coef = item.getSecond();
-            VQG_CNOT(tmp_vec[0],tmp_vec[1]);
+            VQG_CNOT(tmp_vec[0], tmp_vec[1]);
             VQG_RZ(tmp_vec[1], 2*gamma*coef);
-            VQG_CNOT(tmp_vec[0],tmp_vec[1]);
+            VQG_CNOT(tmp_vec[0], tmp_vec[1]);
         }
 
         for(int i=0: 1: qlist.size()){

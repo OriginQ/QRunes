@@ -37,7 +37,7 @@ QRunes中，函数是由返回值，函数名，函数参数和一组语句组�
 
 ::
 
-    Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, bvec oracle_function) {  
+    Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, vector<bool> oracle_function) {  
         H(q1);  
         Measure(q1, c);  
     }
@@ -51,36 +51,45 @@ QRunes中，函数是由返回值，函数名，函数参数和一组语句组�
 5.4 函数的返回值
 -------------------
 
-QRunes中函数的返回类型可以是内置类型、复合类型也可以是void类型。
-其中，
+QRunes中函数的返回类型可以是内置类型、复合类型也可以是void类型。其中，
 
-- 内置类型
+- **内置类型**
 
 ::
 
  qprog  
  circuit  
- variationalCircuit  
- qubit  
- cbit  
+ variationalCircuit 
+ int 
+ double
+ bool  
+ cbit 
+ 
 
-- 复合类型
+- **复合类型**
 
-::
-
- 复合类型即由vector关键字构造的类型集合，其中的类型为经典类型。
-
+复合类型即由vector关键字构造的类型集合及map类型，其中的vector集合中的类型为经典类型。
+  
 比如：
 
 ::
 
     vector<cbit>
+    map
 
-- void 类型
+- **void 类型**
+
+函数不返回任何值。
+
+- **函数回调类型**
+
+callback_type是回调函数类型，由 返回类型<参数> 组成。
+
+比如：
 
 ::
 
- 函数不返回任何值
+    circuit<vector<qubit>>
 
 根据函数的返回值可以将QRunes中的函数分为两个部分：量子函数和经典函数。
 其中的返回值为经典类型、经典类型构造的集合类型和void类型为经典函数，其余为量子函数。
@@ -90,10 +99,10 @@ QRunes中函数的返回类型可以是内置类型、复合类型也可以是vo
 ::
 
     //quantum function  
-    qu_function(vector<qubit> qvec,vector<cbit> cvec){
-        for(let i = 0:1:len(qvec)){
+    qu_function(vector<qubit> qvec, vector<cbit> cvec){
+        for(let i = 0: 1: len(qvec)){
             H(qvec[i]);
-            Measure(qvec[i],cvec[i]);
+            Measure(qvec[i], cvec[i]);
         }
         vector<cbit> cc = getCbitNotEqualZero(cvec);
         for(let c in cc){
@@ -103,7 +112,6 @@ QRunes中函数的返回类型可以是内置类型、复合类型也可以是vo
 
 ::
 
- 
     //classical function  
     vector<cbit> getCbitNotEqualZero(vector<cbit> cvec){  
         vector<cbit> c2;
@@ -131,13 +139,13 @@ QRunes中函数的返回类型可以是内置类型、复合类型也可以是vo
 
 ::
 
- function_name(args...);
+    function_name(args...);
 
 其中的实参可以是常量，变量，多个实参之间用逗号进行分割。
 
 函数调用的方式：
 
-函数调用作为表达式中的一项，常用于赋值表达式，也可称为函数调用表达式。
+- 函数调用作为表达式中的一项，常用于赋值表达式，也可称为函数调用表达式
 
 举例：
 

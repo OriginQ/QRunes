@@ -128,9 +128,9 @@ Deutsch–Jozsa算法是一种经过设计的情况，它证明了量子算法�
         print("The function has a boolean input")
         print("and has a boolean output")
         print("f(0)= (0/1)?")
-        fx0 = input()
+        fx0 = int(input())
         print("f(1)=(0/1)?")
-        fx1 = input()
+        fx1 = int(input())
         oracle_function = [fx0,fx1]
         print("Programming the circuit...")
         two_qubit_deutsch_jozsa_algorithm(oracle_function)
