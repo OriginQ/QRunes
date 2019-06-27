@@ -106,6 +106,7 @@ htmlhelp_basename = 'QRunes_tutorialdoc'
 
 # -- Options for LaTeX output ------------------------------------------------
 
+latex_engine = 'xelatex'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
@@ -115,9 +116,12 @@ latex_elements = {
     #
     # 'pointsize': '10pt',
 
+    'fncychap' : '',
+
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    'preamble': r'''\usepackage{ctex}
+    ''',
 
     # Latex figure (float) alignment
     #
@@ -128,8 +132,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'QRunes_tutorial.tex', 'QRunes\\_tutorial Documentation',
-     'www.originqc.com', 'manual'),
+    (master_doc, 'QPanda2introduction.tex', 'QPanda2 Introduction',
+     'OriginQC', 'manual'),
 ]
 
 
