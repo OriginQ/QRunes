@@ -144,6 +144,27 @@
             H(q);
     }
 
+    Grover_algorithm(vector<qubit> working_qubit, qubit ancilla, vector<cbit> cvec, 
+                        circuit<vector<qubit>,qubit> oracle, int repeate){
+                    
+                    X(ancilla);
+                    for(qubit q in working_qubit)
+                        H(q);
+                    H(ancilla);
+
+                    if(repeate == 0){
+                        let sqrtN = 1 << (working_qubit / 2);
+                        repeate = 100 * sqrtN;
+                    }
+
+                    for(let i = 0 : 1 : repeate){
+                        oracle(working_qubit,ancilla);
+                        diffusion_operator(working_qubit);
+                    }
+
+                    Measure_all(working_qubit,cvec);
+    }
+
     @script:
     if __name__ == '__main__':
         condition = 1
