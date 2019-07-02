@@ -119,7 +119,7 @@ Simon问题(s=11）的线路图设计参考图：
     @qcodes:
     //CNOT operations are performed on q[0]、q[2] and q[1]、 q[2], respectively
     //Perform NOT operations on q[3]
-    QCircuit controlfunc(vector<qubit> q, int index, int value) {
+    circuit controlfunc(vector<qubit> q, int index, int value) {
         let length = q.size() / 2;
         vector<qubit> qvtemp;
         qvtemp.insert(q, 0, length);
@@ -152,7 +152,7 @@ Simon问题(s=11）的线路图设计参考图：
     }
     
     //f(x),x is 2bits variable
-    QCircuit oraclefunc(vector<qubit> q, vector<int> funvalue) {
+    circuit oraclefunc(vector<qubit> q, vector<int> funvalue) {
         let length = q.size()/2;
         for (let i=0: 1: 4){
             let value = funvalue[i];

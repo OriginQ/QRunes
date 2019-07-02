@@ -188,10 +188,10 @@ QPanda::QAOA利用经典量子混合方法，称为quantum-variational-eigensolv
     @qcodes:
     //Solving the problem of Maximum Cutting
     variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, avar beta, avar gamma){
-        for(int i = 0: 1: hp.size()){ 
+        for(let i = 0 : 1: hp.size()){
             vector<qubit> tmp_vec;
-            let item = hp[i];
-            map dict_p = item.getFirst();
+            let hamiltonItem = hp[i];
+            let dict_p = hamiltonItem.getFirst();
             for(map m in dict_p) {
                 tmp_vec.add(qlist[m.first()]);
             }
@@ -202,7 +202,7 @@ QPanda::QAOA利用经典量子混合方法，称为quantum-variational-eigensolv
             VQG_CNOT(tmp_vec[0], tmp_vec[1]);
         }
 
-        for(int i=0: 1: qlist.size()){
+        for(let i=0: 1: qlist.size()){
             VQG_RX(qlist[i],2.0*beta);
         }
     }

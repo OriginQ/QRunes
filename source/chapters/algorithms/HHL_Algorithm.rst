@@ -36,7 +36,7 @@ HHL的限制条件：
         compile_only = False;
 
     @qcodes:
-    QCircuit CRotate(vector<qubit> q) {
+    circuit CRotate(vector<qubit> q) {
         vector<qubit> controlVector;
         controlVector.add(q[1]);
         controlVector.add(q[2]);
@@ -50,7 +50,7 @@ HHL的限制条件：
     }
     
     //Phase estimation algorithms
-    QCircuit hhlPse(vector<qubit> q) {
+    circuit hhlPse(vector<qubit> q) {
      
         H(q[1]);
         H(q[2]);
@@ -68,14 +68,14 @@ HHL的限制条件：
         H(q[1]);
     }
 
-    hhl_no_measure(vector<qubit> q, vector<cbit> c) {
+    hhl_no_measure(vector<qubit> qlist, vector<cbit> clist) {
         //phase estimation
-        hhlPse(q);
+        hhlPse(qlist);
         //rotate
-        CRotate(q);
-        Measure(q[0], c[0]);
-        qif (c[0]) {
-            hhlPse(q).dagger();
+        CRotate(qlist);
+        Measure(qlist[0], clist[0]);
+        qif (clist[0]) {
+            hhlPse(qlist).dagger();
         }
     }
 

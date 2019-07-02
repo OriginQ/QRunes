@@ -140,21 +140,21 @@ Classical           logN              >=2log(N/2)       >=3log(N/3)       Ω(k l
         
     @qcodes:
     // Determine whether the next step needs to be performed based on the classical output information
-    CoinFlip_Algorithm(vector<qubit> q, vector<cbit> c, bool fx) {
-        X(q[0]);
-        H(q[0]);
-        X(q[1]);
-        CNOT(q[0], q[1]);
-        H(q[1]);
+    CoinFlip_Algorithm(vector<qubit> qlist, vector<cbit> clist, bool fx) {
+        X(qlist[0]);
+        H(qlist[0]);
+        X(qlist[1]);
+        CNOT(qlist[0], qlist[1]);
+        H(qlist[1]);
         // If the output is 0, then the corresponding operation is needed later.
         if (fx) {
-            X(q[0]);
+            X(qlist[0]);
         }
-        H(q[0]);
-        CNOT(q[0], q[1]);
-        H(q[0]);
-        Measure(q[0], c[0]);
-        Measure(q[1], c[1]);
+        H(qlist[0]);
+        CNOT(qlist[0], qlist[1]);
+        H(qlist[0]);
+        Measure(qlist[0], clist[0]);
+        Measure(qlist[1], clist[1]);
     }
         
     @script:

@@ -172,21 +172,21 @@
     
     @qcodes:
     //Quantum adder MAJ module
-    QCircuit MAJ(qubit a, qubit b, qubit c) {
+    circuit MAJ(qubit a, qubit b, qubit c) {
         CNOT(c, b);
         CNOT(c, a);
         Toffoli(a, b, c);
     }
 
     //Quantum adder UMA module
-    QCircuit UMA(qubit a, qubit b, qubit c) {
+    circuit UMA(qubit a, qubit b, qubit c) {
         Toffoli(a, b, c);
         CNOT(c, a);
         CNOT(a, b);
     }
 
     //Quantum adder MAJ2 module
-    QCircuit MAJ2(vector<qubit> a, vector<qubit> b, qubit c) {
+    circuit MAJ2(vector<qubit> a, vector<qubit> b, qubit c) {
         let nbit = a.size();
         MAJ(c, a[0], b[0]);
         for(let i=1: 1: nbit) {
@@ -195,7 +195,7 @@
     }
 
     //Quantum adder, consists of MAJ and UMA modules, regardless of the carry term
-    QCircuit Adder(vector<qubit> a, vector<qubit> b, qubit c) {
+    circuit Adder(vector<qubit> a, vector<qubit> b, qubit c) {
         let nbit = a.size();
         MAJ(c, a[0], b[0]);
         for(let i=1: 1: nbit) {
@@ -208,14 +208,14 @@
     }
 
     //Determine if there is a carry
-    QCircuit isCarry(vector<qubit> a, vector<qubit> b, qubit c, qubit carry) {
+    circuit isCarry(vector<qubit> a, vector<qubit> b, qubit c, qubit carry) {
         MAJ2(a, b, c);
         CNOT(b[-1], carry);
         MAJ2(a, b, c).dagger();
     }
 
     //Binding classic data with qubits
-    QCircuit bindData(vector<qubit> qlist, int data) {
+    circuit bindData(vector<qubit> qlist, int data) {
         let checkValue = 1 << qlist.size();
 
         let i = 0;
@@ -231,9 +231,9 @@
     }
 
     //Constant modular addition
-    QCircuit constModAdd(vector<qubit> qa, int C, int M, vector<qubit> qb, vector<qubit> qs1) {
+    circuit constModAdd(vector<qubit> qa, int C, int M, vector<qubit> qb, vector<qubit> qs1) {
         let qNum = qa.size();
-        let tmpValue = (1 << q_num) - M + C;
+        let tmpValue = (1 << qNum) - M + C;
         
         bindData(qb, tmpValue);
         isCarry(qa, qb, qs1[1], qs1[0]);
@@ -265,7 +265,7 @@
     }
 
     //Constant modular multiple
-    QCircuit constModMul(vector<qubit> qa, int constNum, int M, vector<qubit> qs1, vector<qubit> qs2, vector<qubit> qs3) {
+    circuit constModMul(vector<qubit> qa, int constNum, int M, vector<qubit> qs1, vector<qubit> qs2, vector<qubit> qs3) {
         let qNum = qa.size();
 
         for(let i=0: 1: qNum) {
@@ -283,11 +283,11 @@
         }
 
         let crev = modReverse(constNum, M);
-        QCircuit qCircuitTmp1;
+        circuit qCircuitTmp1;
         for(let i=0: 1: qNum) {
             let tmp = crev * pow(2, i);
             tmp = tmp % M;
-            QCircuit qCircuitTmp2;
+            circuit qCircuitTmp2;
             qCircuitTmp2.insert(constModAdd(qs1, tmp, M, qs2, qs3));
             qCircuitTmp2.control(qa[i]);
             qCircuitTmp1.insert(qCircuitTmp2);
@@ -297,7 +297,7 @@
     }
 
     //Constant modular power operation
-    QCircuit constModExp(vector<qubit> qa, vector<qubit> qb, int base, int M, vector<qubit> qs1, vector<qubit> qs2, vector<qubit> qs3) {
+    circuit constModExp(vector<qubit> qa, vector<qubit> qb, int base, int M, vector<qubit> qs1, vector<qubit> qs2, vector<qubit> qs3) {
         let cqNum = qa.size();
         let temp = base;
 
@@ -309,7 +309,7 @@
     }
 
     //Quantum Fourier transform
-    QCircuit qft(vector<qubit> qlist) {
+    circuit qft(vector<qubit> qlist) {
         let qNum = qlist.size();
         for (let i=0: 1: qNum) {
             H(qlist[qNum-1-i]);
