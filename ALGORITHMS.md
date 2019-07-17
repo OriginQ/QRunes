@@ -96,8 +96,7 @@ $$\sum_{ij}\frac{1}{2}(I-σ_i^z σ_j^z)$$
 其中和是对图中（i，j）节点对组成的边集权重的遍历。量子近似优化算法（QAOA）基于这样的事实：我们可以准备一些近似于该哈密顿量的基态的东西并对该状态进行测量，对 N 位量子状态执行测量，并以高概率返回对应于最大切割的比特串。
 为了使描述更具体，让我们回到杠铃图。该图需要两个量子位以表示节点。就会有如下的哈密顿量的形式
 
-<img src="http://chart.googleapis.com/chart?cht=tx&chl= $$\widehat{H} = \frac{1}{2} (I-σ_z^1 ⊗σ_z^0 )= \begin{bmatrix}0& 0 &  0& 0\\ 0 &  1& 0 & 0\\ 0&  0&  1& 0\\ 0 & 0 & 0 & 0\end{bmatrix}$$" style="border:none;">
-
+<img src="http://www.forkosh.com/mathtex.cgi? $$\widehat{H} = \frac{1}{2} (I-σ_z^1 ⊗σ_z^0 )= \begin{bmatrix}0& 0 &  0& 0\\ 0 &  1& 0 & 0\\ 0&  0&  1& 0\\ 0 & 0 & 0 & 0\end{bmatrix}$$">
 
 基序对应于以二进制格式增加整数值（最左边的位是最重要的）。这对应于上面的H ̂操作符的基底是：
 
