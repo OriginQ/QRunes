@@ -39,7 +39,7 @@
   - [10.2 Shor算法的实现](#10.2-Shor)
   - [10.3 Shor算法小结](#10.3-Shor)
 
-
+ <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
 
 # <a name="1-QAOA"></a>QAOA算法
 
