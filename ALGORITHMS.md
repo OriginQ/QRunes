@@ -1,3 +1,5 @@
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
 - [1 QAOA算法](#1-QAOA)
   - [1.1 QAOA算法介绍](#1.1-QAOA)
   - [1.2 QAOA算法的实现](#1.2-QAOA)
@@ -79,7 +81,7 @@
 
 面对寻找最佳切割（或一组最佳切割）的指数成本，我们可以设计出具有特定质量的多项式算法。例如，著名的多项式时间算法是随机分区方法，通过遍历图表的节点并抛掷硬币，如果硬币是正面，则节点在集合S中，否则节点在集合S中。随机分配算法的质量至少是最大切割的50％。对于硬币抛掷过程来说，边被切割中的概率是50％。因此，随机分配产生的切割的期望值可以写成如下：
 
- <img src="http://chart.googleapis.com/chart?cht=tx&chl= $$ \sum W_e\cdot Pr(e \in cut) = \frac{1}{2} \sum W_e$$" style="border:none;">
+$$ \sum W_e\cdot Pr(e \in cut) = \frac{1}{2} \sum W_e$$
 
 由于所有边的总和必然是最大切割的上限，因此随机化方法产生的切割预期值至少是中最佳切割的 0.5 倍。其它多项式方法包括半定规划可以使期望的切割值至少为最大切割的 0.87856 倍。
 
@@ -96,7 +98,7 @@ $$\sum_{ij}\frac{1}{2}(I-σ_i^z σ_j^z)$$
 其中和是对图中（i，j）节点对组成的边集权重的遍历。量子近似优化算法（QAOA）基于这样的事实：我们可以准备一些近似于该哈密顿量的基态的东西并对该状态进行测量，对 N 位量子状态执行测量，并以高概率返回对应于最大切割的比特串。
 为了使描述更具体，让我们回到杠铃图。该图需要两个量子位以表示节点。就会有如下的哈密顿量的形式
 
-<img src="http://www.forkosh.com/mathtex.cgi? $$\widehat{H} = \frac{1}{2} (I-σ_z^1 ⊗σ_z^0 )= \begin{bmatrix}0& 0 &  0& 0\\ 0 &  1& 0 & 0\\ 0&  0&  1& 0\\ 0 & 0 & 0 & 0\end{bmatrix}$$">
+$$\widehat{H} = \frac{1}{2} (I-σ_z^1 ⊗σ_z^0 )= \begin{bmatrix}0& 0 &  0& 0\\ 0 &  1& 0 & 0\\ 0&  0&  1& 0\\ 0 & 0 & 0 & 0\end{bmatrix}$$
 
 基序对应于以二进制格式增加整数值（最左边的位是最重要的）。这对应于上面的H ̂操作符的基底是：
 
