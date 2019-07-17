@@ -60,7 +60,7 @@
 ![image](./source/images/qaoa_2.png)
 
 我们仅对连接不同集合中的节点时才会绘制边。带有剪刀符号的线条表示我们要计算的切割边。对于杠铃图，有两个相等的权重分区对应于最大切割（如上图，右侧两个分区），将杠铃切成两半。我们可以将集合S或¯S中的节点表示为0或1，组成一个长度为N的比特串 。上图的四个分区可以表示为 {00, 11, 01, 10} 其中最左边的比特对应节点 A，最右边的比特对应节点B。用比特串来表示使得表示图的特定分区变得很容易。每个比特串具有相关联的切割权重。
-对任意一个图中，节点分割所使用的比特串长度总是N。可分割的情况总数是 <img src="http://chart.googleapis.com/chart?cht=tx&chl= $2^N$" style="border:none align="center";"> 。例如，方形环见下图：
+对任意一个图中，节点分割所使用的比特串长度总是N。可分割的情况总数是 <img src="http://chart.googleapis.com/chart?cht=tx&chl= $2^N$" style="border:none;"> 。例如，方形环见下图：
 
 ![image](./source/images/qaoa_3.png)
 
