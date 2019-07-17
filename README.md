@@ -1071,4 +1071,4 @@ callback_type是回调函数类型，由 返回类型<参数> 组成。
 
 # <a name="7"></a> 常用量子算法介绍及实现
 
-[常见量子算法](./ALGORITHMS.md)
+[常见量子算法](https://qrunes-tutorial.readthedocs.io/en/latest/chapters/chapter6.html)
