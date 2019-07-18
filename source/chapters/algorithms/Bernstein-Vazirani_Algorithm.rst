@@ -139,24 +139,35 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
         compile_only = False;
         
     @qcodes:
-    // Hadamard gate operation and CNOT gate operation for a+1 qubit
-    BV_QProg(vector<qubit> q, vector<cbit> c, vector<bool> a, bool b) {
-        let length = q.size();
-        X(q[length - 1]);
-        for (let i=0: 1: length) {
-            H(q[i]);
-        }
-        for (let i=0: 1: length-1) {
-            if (a[i]) {
-                CNOT(q[i], q[length - 1]);
+    circuit<vector<qubit>,qubit> generate_bv_oracle(vector<bool> oracle_function){
+        return lambda (vector<qubit> qVec, qubit qu): {
+            let cd = oracle_function.length();
+            
+            for(let i = 0: 1: cd){
+                if(oracle_function[i]){
+                    CNOT(qVec[i], qu);
+                }
             }
+        };
+    }
+
+    BV_QProg(vector<qubit> qVec, vector<cbit> cVec, vector<bool> a, circuit<vector<qubit>,qubit> oracle){
+
+        if(qVec.length() != (a.length()+1)){
+            
         }
-        for (let i=0: 1: length-1) {
-            H(q[i]);
-        }
-        for (let i=0: 1: length-1) {
-            Measure(q[i], c[i]);
-        }  
+        
+        let cd = qVec.length();
+
+        X(qVec[cd-1]);
+        apply_QGate(qVec, H);
+        oracle(qVec, qVec[cd - 1]);
+
+        qVec.pop();
+        
+        apply_QGate(qVec, H);
+        MeasureAll(qVec, cVec);
+
     }
         
     @script:
