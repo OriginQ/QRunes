@@ -105,7 +105,7 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
     }
 
     circuit Hadamard(vector<qubit> q) {
-        for (let i=0: 1: q.size()) {
+        for (let i=0: 1: q.length()) {
             H(q[i]);
         }
     }
@@ -119,7 +119,7 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
     }
 
     // Applying a controlled single operation
-    circuit controlUnitaryPower(vector<qubit> q, qubit controlQubit, int min) {
+    circuit controlUnitaryPower(vector<qubit> qvec, qubit controlQubit, int min) {
         circuit  qCircuit = unitarypower(qvec, min);
         vector<qubit> cControlQubit;
         cControlQubit.append(controlQubit);
@@ -131,9 +131,11 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
         for(let i=0: 1: controlqvec.length()) {
             H(controlqvec[i]);
         }
+
+        vector<qubit> controlqubit;
+
         for (let i=0: 1: controlqvec.length()) {
-            qubit q = controlqvec[controlqvec.length()-1-i];
-            controlUnitaryPower(targetqvec, q, i);
+            controlUnitaryPower(targetqvec, controlqvec[controlqvec.length()-1-i], i);
         }
         QFTdagger(controlqvec);
     }  
@@ -151,7 +153,7 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
         cv = cAlloc_many(cbit_num)
         qpeProg = QProg()
         qpeProg.insert(H(tqv[0]))
-        qpeProg.insert(QPE(cqv, tqv, unitary))
+        qpeProg.insert(QPE(cqv, tqv))
         qpeProg.insert(Measure(cqv[0], cv[0]))
         qpeProg.insert(Measure(cqv[1], cv[1]))
         directly_run(qpeProg)
