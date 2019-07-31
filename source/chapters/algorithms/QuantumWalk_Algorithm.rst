@@ -24,11 +24,11 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
     @qcodes:
     circuit addOne(vector<qubit> q) {
         vector<qubit> vControlQubit;
-        vControlQubit.insert(q, 1, q.length()-1);
+        vControlQubit = q[1:q.length()-1];
         for (let i=0: 1: q.length()) {
             X(q[i]).control(vControlQubit);
             if (vControlQubit.length() >= 1) {
-                vControlQubit.remove(0);
+                vControlQubit.pop(0);
             }
         }
     }

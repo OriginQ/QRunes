@@ -187,7 +187,7 @@
 
     //Quantum adder MAJ2 module
     circuit MAJ2(vector<qubit> a, vector<qubit> b, qubit c) {
-        let nbit = a.size();
+        let nbit = a.length();
         MAJ(c, a[0], b[0]);
         for(let i=1: 1: nbit) {
             MAJ(b[i-1], a[i], b[i]);
@@ -196,7 +196,7 @@
 
     //Quantum adder, consists of MAJ and UMA modules, regardless of the carry term
     circuit Adder(vector<qubit> a, vector<qubit> b, qubit c) {
-        let nbit = a.size();
+        let nbit = a.length();
         MAJ(c, a[0], b[0]);
         for(let i=1: 1: nbit) {
             MAJ(b[i-1], a[i], b[i]);
@@ -216,7 +216,7 @@
 
     //Binding classic data with qubits
     circuit bindData(vector<qubit> qlist, int data) {
-        let checkValue = 1 << qlist.size();
+        let checkValue = 1 << qlist.length();
 
         let i = 0;
         let tmp = data >> 1;
@@ -232,14 +232,14 @@
 
     //Constant modular addition
     circuit constModAdd(vector<qubit> qa, int C, int M, vector<qubit> qb, vector<qubit> qs1) {
-        let qNum = qa.size();
+        let qNum = qa.length();
         let tmpValue = (1 << qNum) - M + C;
         
         bindData(qb, tmpValue);
         isCarry(qa, qb, qs1[1], qs1[0]);
         bindData(qb, tmpValue);
 
-        QCircuit qCircuitTmp1;
+        circuit qCircuitTmp1;
         qCircuitTmp1.insert(bindData(qb, tmpValue));
         qCircuitTmp1.insert(Adder(qa, qb, qs1[1]));
         qCircuitTmp1.insert(bindData(qb, tmpValue));
@@ -248,7 +248,7 @@
 
         X(qs1[0]);
 
-        QCircuit qCircuitTmp2;
+        circuit qCircuitTmp2;
         qCircuitTmp2.insert(bindData(qb, C));
         qCircuitTmp2.insert(Adder(qa, qb, qs1[1]));
         qCircuitTmp2.insert(bindData(qb, C));
@@ -266,11 +266,11 @@
 
     //Constant modular multiple
     circuit constModMul(vector<qubit> qa, int constNum, int M, vector<qubit> qs1, vector<qubit> qs2, vector<qubit> qs3) {
-        let qNum = qa.size();
+        let qNum = qa.length();
 
         for(let i=0: 1: qNum) {
             let tmp = constNum * pow(2, i) % M;
-            QCircuit qCircuitTmp;
+            circuit qCircuitTmp;
             qCircuitTmp.insert(constModAdd(qs1, tmp, M, qs2, qs3));
             qCircuitTmp.control(qa[i]);
             qCircuitTmp.push();
@@ -298,7 +298,7 @@
 
     //Constant modular power operation
     circuit constModExp(vector<qubit> qa, vector<qubit> qb, int base, int M, vector<qubit> qs1, vector<qubit> qs2, vector<qubit> qs3) {
-        let cqNum = qa.size();
+        let cqNum = qa.length();
         let temp = base;
 
         for(let i=0: 1: cqNum) {
@@ -310,7 +310,7 @@
 
     //Quantum Fourier transform
     circuit qft(vector<qubit> qlist) {
-        let qNum = qlist.size();
+        let qNum = qlist.length();
         for (let i=0: 1: qNum) {
             H(qlist[qNum-1-i]);
             for (let j=i+1: 1: qNum) {

@@ -38,8 +38,8 @@ HHL的限制条件：
     @qcodes:
     circuit CRotate(vector<qubit> q) {
         vector<qubit> controlVector;
-        controlVector.add(q[1]);
-        controlVector.add(q[2]);
+        controlVector.append(q[1]);
+        controlVector.append(q[2]);
         X(q[1]);
         RY(q[0], Pi).control(controlVector);
         X(q[1]);

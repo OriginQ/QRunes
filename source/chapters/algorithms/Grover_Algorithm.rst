@@ -105,7 +105,7 @@
     compile_only = False;
 
     @qcodes:
-    circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int arget){
+    circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int target){
         return lambda (vector<qubit> qvec,qubit qu):{
             if(target == 0){
                 X(qvec[0]);
@@ -132,37 +132,32 @@
 
     circuit diffusion_operator(vector<qubit> qvec){
         vector<qubit> controller;
-        controller = qvec[0:qvec.leng()-1];
-        for (qubit q in qvec)
-            H(q);
-        for (qubit q in qvec)
-            X(q);
+        controller = qvec[0:qvec.length()-1];
+        apply_QGate(qvec, H);
+        apply_QGate(qvec, X);
         Z(qvec[qvec.length()-1]).control(controller);
-        for (qubit q in qvec)
-            X(q);
-        for (qubit q in qvec)
-            H(q);
+        apply_QGate(qvec, X);
+        apply_QGate(qvec, H);
     }
 
     Grover_algorithm(vector<qubit> working_qubit, qubit ancilla, vector<cbit> cvec, 
                         circuit<vector<qubit>,qubit> oracle, int repeate){
                     
-                    X(ancilla);
-                    for(qubit q in working_qubit)
-                        H(q);
-                    H(ancilla);
+        X(ancilla);
+        apply_QGate(working_qubit, H);
+        H(ancilla);
 
-                    if(repeate == 0){
-                        let sqrtN = 1 << (working_qubit / 2);
-                        repeate = 100 * sqrtN;
-                    }
+        if(repeate == 0){
+            let sqrtN = 1 << (working_qubit / 2);
+            repeate = 100 * sqrtN;
+        }
 
-                    for(let i = 0 : 1 : repeate){
-                        oracle(working_qubit,ancilla);
-                        diffusion_operator(working_qubit);
-                    }
+        for(let i = 0 : 1 : repeate){
+            oracle(working_qubit,ancilla);
+            diffusion_operator(working_qubit);
+        }
 
-                    Measure_all(working_qubit,cvec);
+        measure_all(working_qubit,cvec);
     }
 
     @script:
