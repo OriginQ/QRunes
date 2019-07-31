@@ -165,12 +165,6 @@
 
 ::
 
-    @settings:
-    language = Python;
-    autoimport = True;
-    compile_only = False;
-    
-    @qcodes:
     //Quantum adder MAJ module
     circuit MAJ(qubit a, qubit b, qubit c) {
         CNOT(c, b);
@@ -219,22 +213,21 @@
         let checkValue = 1 << qlist.length();
 
         let i = 0;
-        let tmp = data >> 1;
-        for(data: -tmp: 1) {
-            if ((data % 2) == 1) {
+
+        while(data >= 1){
+            if(data % 2 == 1)
                 X(qlist[i]);
-            }
-            tmp = tmp >> 1;
             data = data >> 1;
             i = i + 1;
         }
+
     }
 
     //Constant modular addition
     circuit constModAdd(vector<qubit> qa, int C, int M, vector<qubit> qb, vector<qubit> qs1) {
         let qNum = qa.length();
         let tmpValue = (1 << qNum) - M + C;
-        
+
         bindData(qb, tmpValue);
         isCarry(qa, qb, qs1[1], qs1[0]);
         bindData(qb, tmpValue);
@@ -244,7 +237,6 @@
         qCircuitTmp1.insert(Adder(qa, qb, qs1[1]));
         qCircuitTmp1.insert(bindData(qb, tmpValue));
         qCircuitTmp1.control([qs1[0]]);
-        qCircuitTmp1.push();
 
         X(qs1[0]);
 
@@ -253,7 +245,6 @@
         qCircuitTmp2.insert(Adder(qa, qb, qs1[1]));
         qCircuitTmp2.insert(bindData(qb, C));
         qCircuitTmp2.control([qs1[0]]);
-        qCircuitTmp2.push();
 
         X(qs1[0]);
 
@@ -272,8 +263,7 @@
             let tmp = constNum * pow(2, i) % M;
             circuit qCircuitTmp;
             qCircuitTmp.insert(constModAdd(qs1, tmp, M, qs2, qs3));
-            qCircuitTmp.control(qa[i]);
-            qCircuitTmp.push();
+            qCircuitTmp.control([qa[i]]);
         }
 
         for(let i=0: 1: qNum) {
@@ -289,10 +279,9 @@
             tmp = tmp % M;
             circuit qCircuitTmp2;
             qCircuitTmp2.insert(constModAdd(qs1, tmp, M, qs2, qs3));
-            qCircuitTmp2.control(qa[i]);
+            qCircuitTmp2.control([qa[i]]);
             qCircuitTmp1.insert(qCircuitTmp2);
             qCircuitTmp1.dagger();
-            qCircuitTmp1.push();
         }
     }
 
@@ -302,7 +291,7 @@
         let temp = base;
 
         for(let i=0: 1: cqNum) {
-            constModMul(qb, temp, M, qs1, qs2, qs3).control(qa[i]);
+            constModMul(qb, temp, M, qs1, qs2, qs3).control([qa[i]]);
             temp = temp * temp;
             temp = temp % M;
         }
@@ -374,6 +363,36 @@
 
         return m1 - rev2
 
+    def plotBar(xdata, ydata):
+        fig, ax = plt.subplots()
+        fig.set_size_inches(6,6)
+        fig.set_dpi(100)
+        
+        rects =  ax.bar(xdata, ydata, color='b')
+
+        for rect in rects:
+            height = rect.get_height()
+            plt.text(rect.get_x() + rect.get_width() / 2, height, str(height), ha="center", va="bottom")
+        
+        plt.rcParams['font.sans-serif']=['Arial']
+        plt.title("Origin Q", loc='right', alpha = 0.5)
+        plt.ylabel('Times')
+        plt.xlabel('States')
+            
+        plt.show()
+
+    
+    def reorganizeData(measure_qubits, quick_meausre_result):
+        xdata = []
+        ydata = []
+
+        for i in quick_meausre_result:
+            xdata.append(i)
+            ydata.append(quick_meausre_result[i])
+        
+        return xdata, ydata
+
+
     def shorAlg(base, M):
         if ((base < 2) or (base > M - 1)):
             raise('Invalid base!')
@@ -391,8 +410,8 @@
         qb = machine.qAlloc_many(binary_len)
 
         qs1 = machine.qAlloc_many(binary_len)
-        qs2 = machine.qAlloc_many(binary_len) 
-        qs3 = machine.qAlloc_many(2) 
+        qs2 = machine.qAlloc_many(binary_len)
+        qs3 = machine.qAlloc_many(2)
 
         prog = QProg()
 
@@ -403,7 +422,12 @@
 
         directly_run(prog)
         result = quick_measure(qa, 100)
+
         print(result)
+
+        xdata, ydata = reorganizeData(qa, result)
+        plotBar(xdata, ydata)
+
         return result
 
     if __name__=="__main__":
