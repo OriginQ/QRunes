@@ -73,7 +73,7 @@ HHL的限制条件：
         hhlPse(qlist);
         //rotate
         CRotate(qlist);
-        Measure(qlist[0], clist[0]);
+        measure(qlist[0], clist[0]);
         qif (clist[0]) {
             hhlPse(qlist).dagger();
         }

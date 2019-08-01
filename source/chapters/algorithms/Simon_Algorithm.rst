@@ -173,7 +173,7 @@ Simon问题(s=11）的线路图设计参考图：
         }
         //Finally, all quantum logic bits are measured and the output results are obtained.
         for (let i=0: 1: length) {
-            Measure(q[i], c[i]);
+            measure(q[i], c[i]);
         }
     }
     

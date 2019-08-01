@@ -166,7 +166,7 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
         qVec.pop();
         
         apply_QGate(qVec, H);
-        MeasureAll(qVec, cVec);
+        measure_all(qVec, cVec);
 
     }
         

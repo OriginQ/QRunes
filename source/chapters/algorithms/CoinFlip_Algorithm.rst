@@ -153,8 +153,8 @@ Classical           logN              >=2log(N/2)       >=3log(N/3)       Ω(k l
         H(qlist[0]);
         CNOT(qlist[0], qlist[1]);
         H(qlist[0]);
-        Measure(qlist[0], clist[0]);
-        Measure(qlist[1], clist[1]);
+        measure(qlist[0], clist[0]);
+        measure(qlist[1], clist[1]);
     }
         
     @script:
