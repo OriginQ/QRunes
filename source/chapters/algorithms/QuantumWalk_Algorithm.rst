@@ -40,7 +40,7 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
         vControlQbit = qvec[1:qvec.length()];
         circuit qCircuit1 = addOne(qvec);
         circuit qCircuit2 = addOne(qvec);
-        X(q[iLength-1]);
+        X(qvec[iLength-1]);
         qCircuit2.dagger();
     }
 
