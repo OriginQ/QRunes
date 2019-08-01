@@ -117,63 +117,57 @@ Simon问题(s=11）的线路图设计参考图：
         compile_only = False;
         
     @qcodes:
-    //CNOT operations are performed on q[0]、q[2] and q[1]、 q[2], respectively
-    //Perform NOT operations on q[3]
-    circuit controlfunc(vector<qubit> q, int index, int value) {
-        let length = q.length() / 2;
+    circuit controlfunc(vector<qubit> qvec, int index, int value) {
+        let cd = qvec.length() / 2;
         vector<qubit> qvtemp;
-        qvtemp.insert(q, 0, length);
+        qvtemp = qvec[0:cd];
         if (index == 1) {
-            X(q[0]);
+            X(qvec[0]);
         } else if (index == 2) {
             X(q[1]);
         } else if (index == 0) {
-            X(q[0]);
-            X(q[1]);
+            X(qvec[0]);
+            X(qvec[1]);
         }
-        
+
         if (value == 1) {
-            X(q[3]).control(qvtemp);
+            X(qvec[3]).control(qvtemp);
         } else if (value == 2) {
-            X(q[2]).control(qvtemp);
+            X(qvec[2]).control(qvtemp);
         } else if (value == 3) {
-            X(q[2]).control(qvtemp);
-            X(q[3]).control(qvtemp);
+            X(qvec[2]).control(qvtemp);
+            X(qvec[3]).control(qvtemp);
         }
-    
+
         if (index == 1) {
-            X(q[0]);
+            X(qvec[0]);
         } else if (index == 2) {
-            X(q[1]);
+            X(qvec[1]);
         } else if (index == 0) {
-            X(q[0]);
-            X(q[1]);
+            X(qvec[0]);
+            X(qvec[1]);
         }
     }
-    
-    //f(x),x is 2bits variable
-    circuit oraclefunc(vector<qubit> q, vector<int> funvalue) {
-        let length = q.length()/2;
+
+    circuit oraclefunc(vector<qubit> qvec, vector<int> funvalue) {
+        let cd = qvec.length()/2;
         for (let i=0: 1: 4){
             let value = funvalue[i];
-            controlfunc(q, i, value);
+            controlfunc(qvec, i, value);
         }
     }
-    
-    Simon_QProg(vector<qubit> q, cvec c, vector<int> funvalue) {
-        let length = c.size();
-        // q[0]、q[1] Do the Hadamard operation separately
-        for (let i=0: 1: length) {
-            H(q[i]);
+
+    Simon_QProg(vector<qubit> qvec, vector<cbit> cvec, vector<int> funvalue) {
+        let cd = cvec.length();
+        for (let i=0: 1: cd) {
+            H(qvec[i]);
         }
-        oraclefunc(q, funvalue);
-        //Then Hadamard operations are performed on q[0]、q[1], respectively.
-        for (let i=0: 1: length) {
-            H(q[i]);
+        oraclefunc(qvec, funvalue);
+        for (let i=0: 1: cd) {
+            H(qvec[i]);
         }
-        //Finally, all quantum logic bits are measured and the output results are obtained.
-        for (let i=0: 1: length) {
-            measure(q[i], c[i]);
+        for (let i=0: 1: cd) {
+            measure(qvec[i], cvec[i]);
         }
     }
     
