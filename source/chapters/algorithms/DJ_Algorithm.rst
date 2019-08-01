@@ -96,7 +96,7 @@ Deutsch–Jozsa算法是一种经过设计的情况，它证明了量子算法�
     }
 
     Deutsch_Jozsa_algorithm(vector<qubit> qlist,qubit qubit2,vector<cbit> clist,circuit<vector<qubit>,qubit> oracle){
-        X(qubit);
+        X(qubit2);
         apply_QGate(qlist, H);
         H(qubit2);
         oracle(qlist,qubit2);

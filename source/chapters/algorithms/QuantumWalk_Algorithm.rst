@@ -32,19 +32,20 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
             }
         }
     }
-    
-    circuit walkOneStep(vector<qubit> q) {
-        let iLength = q.length();
+
+    circuit walkOneStep(vector<qubit> qvec) {
+        let iLength = qvec.length();
+        X(qvec[iLength-1]);
+        vector<qubit> vControlQbit;
+        vControlQbit = qvec[1:qvec.length()];
+        circuit qCircuit1 = addOne(qvec);
+        circuit qCircuit2 = addOne(qvec);
         X(q[iLength-1]);
-        vector<qubit> vCQubit;
-        vCQubit.insert(q, 1, q.length());
-        addOne(q);
-        X(q[iLength-1]);
-        addOne(q).dagger();
+        qCircuit2.dagger();
     }
 
     //continuous quantum walks,consists of a walker and an evolution operator.
-    quantumWalk(vector<qubit> q, vector<cbit> c) {  
+    quantumWalk(vector<qubit> q, vector<cbit> c) {
         let length = q.length();
         X(q[length-2]);
         X(q[length-2]);
