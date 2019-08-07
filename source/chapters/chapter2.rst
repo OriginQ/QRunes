@@ -33,7 +33,7 @@ dagger的作用是复制一份当前的量子线路，并更新复制的量子�
     circuit cir;
     circuit cir_dagger = cir.dagger();
 
-除了转置共轭操作，您也可以为量子线路添加控制比特。circuit类型为您内置了两个成员函数用于添加控制比特：control、setControl。
+除了转置共轭操作，您也可以为量子线路添加控制比特。circuit类型为您内置了一个成员函数用于添加控制比特：control()。
 
 
 control的作用是复制当前的量子线路，并给复制的量子线路添加控制比特，例如：
@@ -41,7 +41,7 @@ control的作用是复制当前的量子线路，并给复制的量子线路添�
   circuit cir;
   circuit cir_control = cir.control(qvec);
 
-上述都需要接收一个参数，参数类型为QVec，QVec是qubit的vector容器类型。我们将在下一部分仔细介绍。
+上述都需要接收一个参数，参数类型为QVec，qvec是qubit的vector容器类型。我们将在下一部分仔细介绍。
 
 2.1.3 数组类型 Array Construct Type 
 +++++++++++++++++++++++++++++++++++++++++++
@@ -63,7 +63,7 @@ vector是同一种类型的对象的集合，每个对象都有一个对应的�
 
 ::
 
-    for (i = 0: 1: qs.size()) {
+    for (i = 0: 1: qs.length()) {
         H(qs[i]);
     }
 
