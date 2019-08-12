@@ -30,7 +30,7 @@ QRunes中，函数是由返回值，函数名，函数参数和一组语句组�
 ::
 
     return_type? function_name(args){  
-        function_body  
+        //function_body  
     }
 
 举例如下：
@@ -39,7 +39,7 @@ QRunes中，函数是由返回值，函数名，函数参数和一组语句组�
 
     Two_Qubit_DJ_Algorithm_Circuit(qubit q1, qubit q2, cbit c, vector<bool> oracle_function) {  
         H(q1);  
-        Measure(q1, c);  
+        measure(q1, c);  
     }
     
 5.3 函数的参数
@@ -47,6 +47,7 @@ QRunes中，函数是由返回值，函数名，函数参数和一组语句组�
 
 - QRunes中函数不能省略或者为空，函数的形参表由一系列的由逗号分隔符分离的参数类型和参数名组成，如果两个形参的类型相同，则其类型必须重复声明。
 - 在QRunes中所有的函数参数都必须命名之后才可以使用。
+- 形参和实参：类似于局部变量，函数的形参为函数提供了已命名的局部存储空间。他们之间的差别在于形参是在函数的形参表中定义的，并由调用函数时传递给函数的实参初始化。
 
 5.4 函数的返回值
 -------------------
@@ -64,22 +65,90 @@ QRunes中函数的返回类型可以是内置类型、复合类型也可以是vo
  double
  bool  
  cbit 
- 
+
+下面给出一个返回值为qprog 的函数供读者参考：
+::
+
+    BV_QProg(vector<qubit> qVec, vector<cbit> cVec, vector<bool> a, circuit<vector<qubit>,qubit> oracle){
+
+    if(qVec.length() != (a.length()+1)){
+
+    }
+
+    let cd = qVec.length();
+
+    X(qVec[cd-1]);
+    apply_QGate(qVec, H);
+    oracle(qVec, qVec[cd - 1]);
+
+    qVec.pop();
+
+    apply_QGate(qVec, H);
+    measure_all(qVec, cVec);
+}
+
+
 
 - **复合类型**
 
-复合类型即由vector关键字构造的类型集合及map类型，其中的vector集合中的类型为经典类型。
+复合类型即由vector关键字构造的类型集合，其中的vector集合中的类型为经典类型。
   
 比如：
 
 ::
 
     vector<cbit>
-    map
+
+下面给出一个例子工读者参考：
+::
+  
+  circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int target){
+    return lambda (vector<qubit> qvec,qubit qu):{
+        if(target == 0){
+            X(qvec[0]);
+            X(qvec[1]);
+            Toffoli(qvec[0], qvec[1], qu);
+            X(qvec[0]);
+            X(qvec[1]);
+        }
+        if(target == 1){
+            X(qvec[0]);
+            Toffoli(qvec[0], qvec[1], qu);
+            X(qvec[0]);
+        }
+        if(target == 2){
+            X(qvec[1]);
+            Toffoli(qvec[0], qvec[1], qu);
+            X(qvec[1]);
+        }
+        if(target == 3){
+            Toffoli(qvec[0], qvec[1], qu);
+        }
+    };
+}
+
 
 - **void 类型**
 
-函数不返回任何值。
+不带返回值的return语句只能用于返回类型为void的函数。在返回类型为void的函数中，return返回语句不是必需的。下面给出一个C++的例子：
+
+::
+
+
+void swap(int& a, int&b)
+
+{
+
+    if(a == b)
+
+    {
+        return;
+    }
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
+}
 
 - **函数回调类型**
 
@@ -89,7 +158,9 @@ callback_type是回调函数类型，由 返回类型<参数> 组成。
 
 ::
 
-    circuit<vector<qubit>>
+    circuit<vector<qubit> >
+
+注：最右边的两个尖括号（> >）在中间应该要加一个空格。如果空格不存在，则在编译时会存在错误。
 
 根据函数的返回值可以将QRunes中的函数分为两个部分：量子函数和经典函数。
 其中的返回值为经典类型、经典类型构造的集合类型和void类型为经典函数，其余为量子函数。
