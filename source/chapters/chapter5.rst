@@ -30,7 +30,7 @@ QRunes中，函数是由返回值，函数名，函数参数和一组语句组�
 ::
 
     return_type? function_name(args){  
-        //function_body  
+        // function_body  
     }
 
 举例如下：
