@@ -178,94 +178,210 @@ QPanda::QAOA利用经典量子混合方法，称为quantum-variational-eigensolv
 
 下面给出 QRunes 实现 QAOA 算法的代码示例：
 
-::
+.. content-tabs::
 
-    @settings:
-        language = Python;
-        autoimport = True;
-        compile_only = False;
-        
-    @qcodes:
-    //Solving the problem of Maximum Cutting
-    variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, avar beta, avar gamma){
-        for(let i = 0 : 1: hp.size()){
-            vector<qubit> tmp_vec;
-            let hamiltonItem = hp[i];
-            let dict_p = hamiltonItem.getFirst();
-            for(map m in dict_p) {
-                tmp_vec.add(qlist[m.first()]);
-            }
+        .. tab-container:: Python
+            :title: Python
 
-            let coef = item.getSecond();
-            VQG_CNOT(tmp_vec[0], tmp_vec[1]);
-            VQG_RZ(tmp_vec[1], 2*gamma*coef);
-            VQG_CNOT(tmp_vec[0], tmp_vec[1]);
-        }
+            .. code-block:: python
 
-        for(let i=0: 1: qlist.size()){
-            VQG_RX(qlist[i],2.0*beta);
-        }
-    }
+                @settings:
+                    language = Python;
+                    autoimport = True;
+                    compile_only = False;
 
-    @script:
-    import numpy as np
+                @qcodes:
+                //Solving the problem of Maximum Cutting
+                variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, avar beta, avar gamma){
+                    for(let i = 0 : 1: hp.size()){
+                        vector<qubit> tmp_vec;
+                        let hamiltonItem = hp[i];
+                        let dict_p = hamiltonItem.getFirst();
+                        for(map m in dict_p) {
+                            tmp_vec.add(qlist[m.first()]);
+                        }
 
-    #Convert the data format to be processed
-    def trans(friendShip):
-        pro = {}
-        for i in range(len(friendShip)):
-            for j in range (len(friendShip[i])):
-                if i != j:
-                    s = "Z" + str(i) + " " + "Z" + str(j)
-                    pro[s] = friendShip[i][j]
-        return pro
+                        let coef = tmp_vec.getSecond();
+                        VQG_CNOT(tmp_vec[0], tmp_vec[1]);
+                        VQG_RZ(tmp_vec[1], 2*gamma);
+                        VQG_CNOT(tmp_vec[0], tmp_vec[1]);
+                    }
 
-    if __name__=="__main__":
-        firendShip =[[0, 0.8, 0.2, -0.2],[0.8, 0, 0, 0.7],[0.2, 0, 0, -0.3],[-0.2, 0.7, -0.3, 0]]
-        print("what we r need to handle:")
-        print(firendShip)
-        problem = trans(firendShip)
+                    for(let i=0: 1: qlist.size()){
+                        VQG_RX(qlist[i],2.0*beta);
+                    }
+                }
 
-        #Bulid pauli operator base on the data of problem
-        Hp = PauliOperator(problem)
-        qubit_num = Hp.getMaxIndex()
+                @script:
+                import numpy as np
 
-        machine = init_quantum_machine(QMachineType.CPU_SINGLE_THREAD)
-        qlist = machine.qAlloc_many(qubit_num)
-        step = 4
-        beta = var(np.ones((step,1), dtype = 'float64'), True)
-        gamma = var(np.ones((step,1), dtype = 'float64'), True)
-       
-        #Create a variable quantum circuit
-        vqc = VariationalQuantumCircuit()
+                #Convert the data format to be processed
+                def trans(friendShip):
+                    pro = {}
+                    for i in range(len(friendShip)):
+                        for j in range (len(friendShip[i])):
+                            if i != j:
+                                s = "Z" + str(i) + " " + "Z" + str(j)
+                                pro[s] = friendShip[i][j]
+                    return pro
 
-        #Insert Hadamard gates to each qubit as initial condition
-        for i in qlist:
-            vqc.insert(VariationalQuantumGate_H(i))
+                if __name__=="__main__":
+                    firendShip =[[0, 0.8, 0.2, -0.2],[0.8, 0, 0, 0.7],[0.2, 0, 0, -0.3],[-0.2, 0.7, -0.3, 0]]
+                    print("what we r need to handle:")
+                    print(firendShip)
+                    problem = trans(firendShip)
 
-        #Insert quantum circuits corresponding to each step according to the step size
-        for i in range(step):    
-            vqc.insert(oneCircuit(qlist, Hp.toHamiltonian(1), beta[i], gamma[i]))
+                    #Bulid pauli operator base on the data of problem
+                    Hp = PauliOperator(problem)
+                    qubit_num = Hp.getMaxIndex()
 
-        #Calculate loss variables
-        loss = qop(vqc, Hp, machine, qlist)  
-        #Use momentum-based optimizer and get result variables
-        optimizer = MomentumOptimizer.minimize(loss, 0.02, 0.9)
-        leaves = optimizer.get_variables()
+                    machine = init_quantum_machine(QMachineType.CPU_SINGLE_THREAD)
+                    qlist = machine.qAlloc_many(qubit_num)
+                    step = 4
+                    beta = var(np.ones((step,1), dtype = 'float64'), True)
+                    gamma = var(np.ones((step,1), dtype = 'float64'), True)
 
-        for i in range(100):
-            loss_value = optimizer.get_loss()
-            print("i: ", i, " loss:", loss_value )
-            optimizer.run(leaves, 0)
+                    #Create a variable quantum circuit
+                    vqc = VariationalQuantumCircuit()
 
-        prog = QProg()
-        qcir = vqc.feed()
-        prog.insert(qcir)
-        #Run quantum programs
-        directly_run(prog)
+                    #Insert Hadamard gates to each qubit as initial condition
+                    for i in qlist:
+                        vqc.insert(VariationalQuantumGate_H(i))
 
-        result = quick_measure(qlist, 100)
-        print(result)
+                    #Insert quantum circuits corresponding to each step according to the step size
+                    for i in range(step):
+                        vqc.insert(oneCircuit(qlist, Hp.toHamiltonian(1), beta[i], gamma[i]))
+
+                    #Calculate loss variables
+                    loss = qop(vqc, Hp, machine, qlist)
+                    #Use momentum-based optimizer and get result variables
+                    optimizer = MomentumOptimizer.minimize(loss, 0.02, 0.9)
+                    leaves = optimizer.get_variables()
+
+                    for i in range(100):
+                        loss_value = optimizer.get_loss()
+                        print("i: ", i, " loss:", loss_value )
+                        optimizer.run(leaves, 0)
+
+                    prog = QProg()
+                    qcir = vqc.feed()
+                    prog.insert(qcir)
+                    #Run quantum programs
+                    directly_run(prog)
+
+                    result = quick_measure(qlist, 100)
+                    print(result)
+
+        .. tab-container:: Cpp
+            :title: Cpp
+
+            .. code-block:: Python
+
+                @settings:
+                    language = C++;
+                    autoimport = True;
+                    compile_only = False;
+                    
+                @qcodes:
+                variationalCircuit oneCircuit(vector<qubit> qlist, hamiltonian hp, avar beta, avar gamma){
+                    for(let i = 0 : 1: hp.size()){
+                        vector<qubit> tmp_vec;
+                        let hamiltonItem = hp[i];
+                        let dict_p = hamiltonItem.getFirst();
+                        for(map m in dict_p) {
+                            tmp_vec.append(qlist[m.first()]);
+                        }
+
+
+                        let coef = tmp_vec[1];
+                        VQG_CNOT(tmp_vec[0], tmp_vec[1]);
+                        VQG_RZ(tmp_vec[1], 2*gamma);
+                        VQG_CNOT(tmp_vec[0], tmp_vec[1]);
+                    }
+
+                    for(let j=0: 1: qlist.size()){
+                        VQG_RX(qlist[j],2.0*beta);
+                    }
+                }
+
+                @script:
+                void transverter(MatrixXf & friendship, PauliOperator::PauliMap & friendship_map) {
+                    for (size_t i = 0; i < friendship.rows(); i++) {
+                        for (size_t j = i+1; j < friendship.cols(); j++) {
+                            stringstream ss_temp;
+                            ss_temp << "Z" << i << " " << "Z" << j;
+                            string s_temp(ss_temp.str());
+                            friendship_map.insert(make_pair(s_temp, friendship(i, j)));
+                        }
+                    }
+
+                    cout << friendship.rows() << endl;
+                }
+
+                string  testQAOA(MatrixXf & friendship) {
+                    auto qvm = initQuantumMachine(CPU);
+
+                    PauliOperator::PauliMap  friendship_map;
+                    transverter(friendship, friendship_map);
+                    PauliOperator Hp(friendship_map);
+
+                    auto qubit_num = Hp.getMaxIndex();
+                    auto qvec = qAllocMany(qubit_num);
+                    int step = 4;
+
+                    var x(MatrixXd::Random(step, 1), true);
+                    var y(MatrixXd::Random(step, 1), true);
+
+                    VQC  qprog;
+                    for (auto qubit : qvec) {
+                        qprog.insert(VQG_H(qubit));
+                    }
+
+
+                    for (size_t i = 0; i < step; i++) {
+                        qprog.insert(oneCircuit(qvec, Hp.toHamiltonian(), x[i], y[i]));
+                    }
+                
+                    var loss = qop(qprog, Hp, qvm, qvec);
+                    auto optimizer = MomentumOptimizer::minimize(loss, 0.02, 0.9);
+
+                    auto leaves = optimizer->get_variables();
+                    size_t iterations = 10;
+                    for (size_t i = 0; i < iterations; i++) {
+                        optimizer->run(leaves);
+                        std::cout << " iter: " << i << " loss : " << optimizer->get_loss() << std::endl;
+                    }
+
+                    QProg prog;
+                    prog << qprog.feed();
+                    directlyRun(prog);
+                    auto result = quickMeasure(qvec, 10);
+                    size_t temp = 0;
+                    string key;
+                    for (auto i : result) {
+                        if (i.second > temp) {
+                            temp = i.second;
+                            key = i.first;
+                        }
+                    }
+                    destroyQuantumMachine(qvm);
+                    return key;
+                }
+
+                int main() {
+                    const int prisoner_count = 4;
+                    MatrixXf friendship = MatrixXf::Zero(prisoner_count, prisoner_count);
+                    friendship << 0, 0.8, 0.2, -0.2,
+                        0.8, 0, 0, 0.7,
+                        0.2, 0, 0, -0.3,
+                        -0.2, 0.7, -0.3, 0;
+                    cout << friendship << endl;
+                    string result = testQAOA(friendship);
+                    cout << result << endl;
+                    getchar();
+                }
+
+
 
 6.1.3 QAOA算法小结
 --------------------

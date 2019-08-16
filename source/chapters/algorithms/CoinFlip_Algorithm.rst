@@ -131,64 +131,133 @@ Classical           logN              >=2log(N/2)       >=3log(N/3)       Ω(k l
 
 下面给出 QRunes 实现 CoinFlip 算法的代码示例：
 
-::
+.. content-tabs::
 
-    @settings:
-        language = Python;
-        autoimport = True;
-        compile_only = False;
-        
-    @qcodes:
-    // Determine whether the next step needs to be performed based on the classical output information
-    CoinFlip_Algorithm(vector<qubit> qlist, vector<cbit> clist, bool fx) {
-        X(qlist[0]);
-        H(qlist[0]);
-        X(qlist[1]);
-        CNOT(qlist[0], qlist[1]);
-        H(qlist[1]);
-        // If the output is 0, then the corresponding operation is needed later.
-        if (fx) {
-            X(qlist[0]);
-        }
-        H(qlist[0]);
-        CNOT(qlist[0], qlist[1]);
-        H(qlist[0]);
-        measure(qlist[0], clist[0]);
-        measure(qlist[1], clist[1]);
-    }
-        
-    @script:
-    import sys
-    def CoinFlip_Prog(prog, q, c, fx):
-        temp = CoinFlip_Algorithm(q, c, fx)
-        prog.insert(temp)
-        res = directly_run(prog)
-        return ( c[1].eval() << 1) + int(c[0].eval())
-    
-    if __name__ == '__main__':
-        print('Entanglement Flip Game')
-        fx = int(input('Input choice of Q:(0/1)\n'))
-        print('Programming the circuit...')
-    
-        init(QMachineType.CPU_SINGLE_THREAD)
-    
-        qubit_num = 2
-        cbit_num = 2
-        # Initialization of 2 quantum bits
-        qv = qAlloc_many(qubit_num)
-        cv = cAlloc_many(cbit_num)
-        out_come = 0
-        prog = QProg()
-        temp = CoinFlip_Prog(prog, qv, cv, fx)
-        for i in range(0, 10, 1):
-            out_come = CoinFlip_Prog(prog, qv, cv, fx)
-            if out_come != temp:
-                print('Q wins!')
-                sys.exit(0)
-        print('max entanglement!')
-        print('P wins!')
-    
-        finalize()
+        .. tab-container:: Python
+            :title: Python
+
+            .. code-block:: python
+
+                @settings:
+                        language = Python;
+                        autoimport = True;
+                        compile_only = False;
+
+                @qcodes:
+                // Determine whether the next step needs to be performed based on the classical output information
+                CoinFlip_Algorithm(vector<qubit> qlist, vector<cbit> clist, bool fx) {
+                X(qlist[0]);
+                H(qlist[0]);
+                X(qlist[1]);
+                CNOT(qlist[0], qlist[1]);
+                H(qlist[1]);
+                // If the output is 0, then the corresponding operation is needed later.
+
+                if (fx) {
+                        X(qlist[0]);
+                }
+                H(qlist[0]);
+                CNOT(qlist[0], qlist[1]);
+                H(qlist[0]);
+                measure(qlist[0], clist[0]);
+                measure(qlist[1], clist[1]);
+                }
+
+                @script:
+                import sys
+                def CoinFlip_Prog(prog, q, c, fx):
+                temp = CoinFlip_Algorithm(q, c, fx)
+                prog.insert(temp)
+                res = directly_run(prog)
+                return ( c[1].eval() << 1) + int(c[0].eval())
+
+                if __name__ == '__main__':
+                print('Entanglement Flip Game')
+                fx = int(input('Input choice of Q:(0/1)\n'))
+                print('Programming the circuit...')
+
+                init(QMachineType.CPU_SINGLE_THREAD)
+
+                qubit_num = 2
+                cbit_num = 2
+                # Initialization of 2 quantum bits
+                qv = qAlloc_many(qubit_num)
+                cv = cAlloc_many(cbit_num)
+                out_come = 0
+                prog = QProg()
+                temp = CoinFlip_Prog(prog, qv, cv, fx)
+                for i in range(0, 10, 1):
+                        out_come = CoinFlip_Prog(prog, qv, cv, fx)
+                        if out_come != temp:
+                        print('Q wins!')
+                        sys.exit(0)
+                print('max entanglement!')
+                print('P wins!')
+
+                finalize()
+
+        .. tab-container:: Cpp
+            :title: Cpp
+
+            .. code-block:: Python
+
+                @settings:
+                        language = C++;
+                        autoimport = True;
+                        compile_only = False;
+                
+                @qcodes:
+                // Determine whether the next step needs to be performed based on the classical output information
+                CoinFlip_Algorithm(vector<qubit> qlist, vector<cbit> clist, bool fx) {
+                X(qlist[0]);
+                H(qlist[0]);
+                X(qlist[1]);
+                CNOT(qlist[0], qlist[1]);
+                H(qlist[1]);
+                // If the output is 0, then the corresponding operation is needed later.
+                if (fx) {
+                        X(qlist[0]);
+                }
+                H(qlist[0]);
+                CNOT(qlist[0], qlist[1]);
+                H(qlist[0]);
+                measure(qlist[0], clist[0]);
+                measure(qlist[1], clist[1]);
+                }
+                
+                @script:
+                int CoinFlip_Prog(QProg & prog, vector<Qubit*> qVec, vector<ClassicalCondition> cVec, bool fx) {
+                auto temp = CoinFlip_Algorithm(qVec, cVec, fx);
+                prog << temp;
+                directlyRun(prog);
+                return ((1 << cVec[1].eval()) + (int)cVec[0].eval());
+                }
+
+                int main() {
+                bool fx = 0;
+                cout << "Entanglement Flip Game\n" << endl
+                        << "\n" << endl
+                        << "Input choice of Q:(0/1)\n";
+                cin >> fx;
+                cout << "Programming the circuit..." << endl;
+                int outcome = 0;
+                init(QMachineType::CPU);
+                vector<Qubit*> qVec = qAllocMany(2);
+                vector<ClassicalCondition> cVec = cAllocMany(2);
+                QProg prog;
+                auto temp = CoinFlip_Prog(prog,qVec, cVec, fx);
+                for (auto i = 0; i < 10; i++) {
+                        outcome = CoinFlip_Prog(prog,qVec,cVec,fx);
+                        if (temp != outcome) {
+                        cout << "Q wins!\n" << endl;
+                        return 0;
+                        }
+                }
+                cout << "max entanglement!" << endl;
+                cout << "P wins!\n" << endl;
+                }
+
+
 
 6.7.3 CoinFlip算法小结
 ------------------------

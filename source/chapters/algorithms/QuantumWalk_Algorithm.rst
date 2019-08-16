@@ -14,67 +14,144 @@ QuantumWalk作为一种新的量子计算模型具有巨大的前景，为经典
 
 下面给出 QRunes 实现 QuantumWalk 算法的代码示例：
 
-::
+.. content-tabs::
 
-    @settings:
-        language = Python;
-        autoimport = True;
-        compile_only = False;
-        
-    @qcodes:
-    circuit addOne(vector<qubit> q) {
-        vector<qubit> vControlQubit;
-        vControlQubit = q[1:q.length()-1];
-        for (let i=0: 1: q.length()) {
-            X(q[i]).control(vControlQubit);
-            if (vControlQubit.length() >= 1) {
-                vControlQubit.pop(0);
-            }
-        }
-    }
+        .. tab-container:: Python
+            :title: Python
 
-    circuit walkOneStep(vector<qubit> qvec) {
-        let iLength = qvec.length();
-        X(qvec[iLength-1]);
-        vector<qubit> vControlQbit;
-        vControlQbit = qvec[1:qvec.length()];
-        circuit qCircuit1 = addOne(qvec);
-        circuit qCircuit2 = addOne(qvec);
-        X(qvec[iLength-1]);
-        qCircuit2.dagger();
-    }
+            .. code-block:: python
 
-    //continuous quantum walks,consists of a walker and an evolution operator.
-    quantumWalk(vector<qubit> q, vector<cbit> c) {
-        let length = q.length();
-        X(q[length-2]);
-        X(q[length-2]);
-        for (let i=0: ((1 << length)-1): 1) {
-            H(q[length - 1]);
-            walkOneStep(q);
-        }
-    }
-    
-    @script:
-    import sys
-    if __name__ == '__main__':
-        print('welcome to Quantum walk')
-        qubit_num = int(input('please input qubit num\n'))
-        if qubit_num < 0 or qubit_num > 24:
-            print('error: qubitnum need > 0 and < 24')
-            sys.exit(1)
-        init(QMachineType.CPU_SINGLE_THREAD)
-    
-        cbit_num = qubit_num
-        qv = qAlloc_many(qubit_num)
-        cv = cAlloc_many(cbit_num)
-        qv.append(qAlloc())
-        qwAlgorithm = quantumWalk(qv, cv)
-        result = prob_run_dict(qwAlgorithm, qv)
-        for key,value in result.items():
-            print(str(key) + " : " + str(value))
-    
-        finalize()
+                @settings:
+                    language = Python;
+                    autoimport = True;
+                    compile_only = False;
+
+                @qcodes:
+                circuit addOne(vector<qubit> q) {
+                    vector<qubit> vControlQubit;
+                    vControlQubit = q[1:q.length()-1];
+                    for (let i=0: 1: q.length()) {
+                        X(q[i]).control(vControlQubit);
+                        if (vControlQubit.length() >= 1) {
+                            vControlQubit.pop(0);
+                        }
+                    }
+                }
+
+                circuit walkOneStep(vector<qubit> qvec) {
+                    let iLength = qvec.length();
+                    X(qvec[iLength-1]);
+                    vector<qubit> vControlQbit;
+                    vControlQbit = qvec[1:qvec.length()];
+                    circuit qCircuit1 = addOne(qvec);
+                    circuit qCircuit2 = addOne(qvec);
+                    X(qvec[iLength-1]);
+                    qCircuit2.dagger();
+                }
+
+                //continuous quantum walks,consists of a walker and an evolution operator.
+                quantumWalk(vector<qubit> q, vector<cbit> c) {
+                    let length = q.length();
+                    X(q[length-2]);
+                    X(q[length-2]);
+                    for (let i=0: ((1 << length)-1): 1) {
+                        H(q[length - 1]);
+                        walkOneStep(q);
+                    }
+                }
+
+                @script:
+                import sys
+                if __name__ == '__main__':
+                    print('welcome to Quantum walk')
+                    qubit_num = int(input('please input qubit num\n'))
+                    if qubit_num < 0 or qubit_num > 24:
+                        print('error: qubitnum need > 0 and < 24')
+                        sys.exit(1)
+                    init(QMachineType.CPU_SINGLE_THREAD)
+
+                    cbit_num = qubit_num
+                    qv = qAlloc_many(qubit_num)
+                    cv = cAlloc_many(cbit_num)
+                    qv.append(qAlloc())
+                    qwAlgorithm = quantumWalk(qv, cv)
+                    result = prob_run_dict(qwAlgorithm, qv)
+                    for key,value in result.items():
+                        print(str(key) + " : " + str(value))
+
+                    finalize()
+
+        .. tab-container:: Cpp
+            :title: Cpp
+
+            .. code-block:: Python
+
+                @settings:
+                    language = C++;
+                    autoimport = True;
+                    compile_only = False;
+                    
+                @qcodes:
+                circuit addOne(vector<qubit> q) {
+                    vector<qubit> vControlQubit;
+                    vControlQubit = q[1:q.length()-1];
+                    for (let i=0: 1: q.length()) {
+                        X(q[i]).control(vControlQubit);
+                        if (vControlQubit.length() >= 1) {
+                            vControlQubit.remove(0);
+                        }
+                    }
+                }
+
+                circuit walkOneStep(vector<qubit> qvec) {
+                    let iLength = qvec.length();
+                    X(qvec[iLength-1]);
+                    vector<qubit> vControlQbit;
+                    vControlQbit = qvec[1:qvec.length()];
+                    circuit qCircuit1 = addOne(qvec);
+                    circuit qCircuit2 = addOne(qvec);
+                    X(qvec[iLength-1]);
+                    qCircuit2.dagger();
+                }
+
+                //continuous quantum walks,consists of a walker and an evolution operator.
+                quantumWalk(vector<qubit> q, vector<cbit> c) {
+                    let length = q.length();
+                    X(q[length-2]);
+                    X(q[length-2]);
+                    for (let i=0: ((1 << length)-1): 1) {
+                        H(q[length - 1]);
+                        walkOneStep(q);
+                    }
+                }
+
+                @script:
+                int main() {
+                    int qubitnum = 0;
+                    cout << "welcome to Quantum walk\n" << endl
+                        << "\n" << endl
+                        << "please input qubit num\n";
+                    cin >> qubitnum;
+
+                    if ((qubitnum < 0) || (qubitnum > 24))
+                    {
+                        QCERR("qubitnum need > 0 and <24");
+                        exit(1);
+                    }
+                    init(QMachineType::CPU);
+                    vector<Qubit*> qVec = qAllocMany(qubitnum);
+                    vector<ClassicalCondition> cVec = cAllocMany(qubitnum);
+                    qVec.push_back(qAlloc());
+                    auto qwAlgorithm = quantumWalk(qVec, cVec);
+                    auto reuslt = directlyRun(qwAlgorithm);
+
+                    for(auto var : reuslt)
+                    {
+                        cout << var.first << " : " << var.second << endl;
+                    }
+                    finalize();
+                }
+
 
 6.5.3 QuantumWalk算法小结
 ----------------------------
