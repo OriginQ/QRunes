@@ -59,182 +59,177 @@ Deutsch–Jozsa算法是一种经过设计的情况，它证明了量子算法�
 
 下面给出 QRunes 实现 Deutsch–Jozsa 算法的代码示例：
 
-.. content-tabs::
 
-        .. tab-container:: Python
-            :title: Python
+.. tabs::
 
-            .. code-block:: python
+   .. code-tab:: python
 
-                @settings:
-                    language = Python;
-                    autoimport = True;
-                    compile_only = False;
+        @settings:
+                language = Python;
+                autoimport = True;
+                compile_only = False;
 
-                @qcodes:
-                circuit<vector<qubit>,qubit> generate_two_qubit_oracle(vector<bool> oracle_function){
-                    return lambda (vector<qubit> qlist,qubit qubit2):{
-                        if (oracle_function[0] == false &&
-                            oracle_function[1] == true)
-                        {
-                            // f(x) = x;
-                            CNOT(qlist[0], qubit2);
-                        }
-                        else if (oracle_function[0] == true &&
-                            oracle_function[1] == false)
-                        {
-                            // f(x) = x + 1;
-                            CNOT(qlist[0], qubit2);
-                            X(qubit2);
-                        }
-                        else if (oracle_function[0] == true &&
-                            oracle_function[1] == true)
-                        {
-                            // f(x) = 1
-                            X(qubit2);
-                        }
-                        else
-                        {
-                            // f(x) = 0, do nothing  
-                        }
-                    };
-                }
+            @qcodes:
+            circuit<vector<qubit>,qubit> generate_two_qubit_oracle(vector<bool> oracle_function){
+                return lambda (vector<qubit> qlist,qubit qubit2):{
+                    if (oracle_function[0] == false &&
+                        oracle_function[1] == true)
+                    {
+                        // f(x) = x;
+                        CNOT(qlist[0], qubit2);
+                    }
+                    else if (oracle_function[0] == true &&
+                        oracle_function[1] == false)
+                    {
+                        // f(x) = x + 1;
+                        CNOT(qlist[0], qubit2);
+                        X(qubit2);
+                    }
+                    else if (oracle_function[0] == true &&
+                        oracle_function[1] == true)
+                    {
+                        // f(x) = 1
+                        X(qubit2);
+                    }
+                    else
+                    {
+                        // f(x) = 0, do nothing  
+                    }
+                };
+            }
 
-                Deutsch_Jozsa_algorithm(vector<qubit> qlist,qubit qubit2,vector<cbit> clist,circuit<vector<qubit>,qubit> oracle){
-                    X(qubit2);
-                    apply_QGate(qlist, H);
-                    H(qubit2);
-                    oracle(qlist,qubit2);
-                    apply_QGate(qlist, H);
-                    measure_all(qlist,clist);
-                }
+            Deutsch_Jozsa_algorithm(vector<qubit> qlist,qubit qubit2,vector<cbit> clist,circuit<vector<qubit>,qubit> oracle){
+                X(qubit2);
+                apply_QGate(qlist, H);
+                H(qubit2);
+                oracle(qlist,qubit2);
+                apply_QGate(qlist, H);
+                measure_all(qlist,clist);
+            }
 
-                @script:
-                def two_qubit_deutsch_jozsa_algorithm(boolean_function):
-                    init(QMachineType.CPU_SINGLE_THREAD)
-                    qubit_num = 2
-                    cbit_num = 1
-                    qvec = qAlloc_many(qubit_num)
-                    cvec = cAlloc_many(cbit_num)
-                    oracle = generate_two_qubit_oracle(boolean_function)
-                    prog = Deutsch_Jozsa_algorithm([qvec[0]],qvec[1],[cvec[0]],oracle)
-                    result = directly_run(prog)
-                    if cvec[0].eval() == False:
-                        print("Constant function!")
-                    elif cvec[0].eval() == True:
-                        print("Balanced function!")
-                    finalize()
+            @script:
+            def two_qubit_deutsch_jozsa_algorithm(boolean_function):
+                init(QMachineType.CPU_SINGLE_THREAD)
+                qubit_num = 2
+                cbit_num = 1
+                qvec = qAlloc_many(qubit_num)
+                cvec = cAlloc_many(cbit_num)
+                oracle = generate_two_qubit_oracle(boolean_function)
+                prog = Deutsch_Jozsa_algorithm([qvec[0]],qvec[1],[cvec[0]],oracle)
+                result = directly_run(prog)
+                if cvec[0].eval() == False:
+                    print("Constant function!")
+                elif cvec[0].eval() == True:
+                    print("Balanced function!")
+                finalize()
 
 
-                if __name__ == '__main__':
-                    fx0 = 0
-                    fx1 = 1
-                    print("input the input function")
-                    print("The function has a boolean input")
-                    print("and has a boolean output")
-                    print("f(0)= (0/1)?")
-                    fx0 = int(input())
-                    print("f(1)=(0/1)?")
-                    fx1 = int(input())
-                    oracle_function = [fx0,fx1]
-                    print("Programming the circuit...")
-                    two_qubit_deutsch_jozsa_algorithm(oracle_function)
+            if __name__ == '__main__':
+                fx0 = 0
+                fx1 = 1
+                print("input the input function")
+                print("The function has a boolean input")
+                print("and has a boolean output")
+                print("f(0)= (0/1)?")
+                fx0 = int(input())
+                print("f(1)=(0/1)?")
+                fx1 = int(input())
+                oracle_function = [fx0,fx1]
+                print("Programming the circuit...")
+                two_qubit_deutsch_jozsa_algorithm(oracle_function)
 
-        .. tab-container:: Cpp
-            :title: Cpp
+   .. code-tab:: c++
 
-            .. code-block:: Python
+        @settings:
+                language = C++;
+                autoimport = True;
+                compile_only = False;
+                
+            @qcodes:
+            circuit<vector<qubit>,qubit> generate_two_qubit_oracle(vector<bool> oracle_function){
+                return lambda (vector<qubit> qlist,qubit qubit2):{
+                    if (oracle_function[0] == false &&
+                        oracle_function[1] == true)
+                    {
+                        // f(x) = x;
+                        CNOT(qlist[0], qubit2);
+                    }
+                    else if (oracle_function[0] == true &&
+                        oracle_function[1] == false)
+                    {
+                        // f(x) = x + 1;
+                        CNOT(qlist[0], qubit2);
+                        X(qubit2);
+                    }
+                    else if (oracle_function[0] == true &&
+                        oracle_function[1] == true)
+                    {
+                        // f(x) = 1
+                        X(qubit2);
+                    }
+                    else
+                    {
+                        // f(x) = 0, do nothing
+                    }
+                };
+            }
 
-                @settings:
-                    language = C++;
-                    autoimport = True;
-                    compile_only = False;
-                    
-                @qcodes:
-                circuit<vector<qubit>,qubit> generate_two_qubit_oracle(vector<bool> oracle_function){
-                    return lambda (vector<qubit> qlist,qubit qubit2):{
-                        if (oracle_function[0] == false &&
-                            oracle_function[1] == true)
-                        {
-                            // f(x) = x;
-                            CNOT(qlist[0], qubit2);
-                        }
-                        else if (oracle_function[0] == true &&
-                            oracle_function[1] == false)
-                        {
-                            // f(x) = x + 1;
-                            CNOT(qlist[0], qubit2);
-                            X(qubit2);
-                        }
-                        else if (oracle_function[0] == true &&
-                            oracle_function[1] == true)
-                        {
-                            // f(x) = 1
-                            X(qubit2);
-                        }
-                        else
-                        {
-                            // f(x) = 0, do nothing
-                        }
-                    };
-                }
+            Deutsch_Jozsa_algorithm(vector<qubit> qlist,qubit qubit2,vector<cbit> clist,circuit<vector<qubit>,qubit> oracle){
+                X(qubit2);
+                apply_QGate(qlist, H);
+                H(qubit2);
+                oracle(qlist,qubit2);
+                apply_QGate(qlist, H);
+                measure_all(qlist,clist);
+            }
 
-                Deutsch_Jozsa_algorithm(vector<qubit> qlist,qubit qubit2,vector<cbit> clist,circuit<vector<qubit>,qubit> oracle){
-                    X(qubit2);
-                    apply_QGate(qlist, H);
-                    H(qubit2);
-                    oracle(qlist,qubit2);
-                    apply_QGate(qlist, H);
-                    measure_all(qlist,clist);
-                }
-
-                @script:
-                void two_qubit_deutsch_jozsa_algorithm(vector<bool> boolean_function)
+            @script:
+            void two_qubit_deutsch_jozsa_algorithm(vector<bool> boolean_function)
+            {
+                init(QMachineType::CPU);
+                auto qvec = qAllocMany(2);
+                auto c = cAlloc();
+                if (qvec.size() != 2)
                 {
-                    init(QMachineType::CPU);
-                    auto qvec = qAllocMany(2);
-                    auto c = cAlloc();
-                    if (qvec.size() != 2)
-                    {
-                        QCERR("qvec size error the size of qvec must be 2");
-                        throw invalid_argument("qvec size error the size of qvec must be 2");
-                    }
-
-                    auto oracle = generate_two_qubit_oracle(boolean_function);
-                    QProg prog;
-                    prog << Deutsch_Jozsa_algorithm({ qvec[0] }, qvec[1], { c }, oracle);
-
-                    /* To Print The Circuit */
-                    /*
-                    extern QuantumMachine* global_quantum_machine;
-                    cout << transformQProgToQRunes(prog, global_quantum_machine) << endl;
-                    */
-
-                    directlyRun(prog);
-                    if (c.eval() == false)
-                    {
-                        cout << "Constant function!" << endl;
-                    }
-                    else if (c.eval() == true)
-                    {
-                        cout << "Balanced function!" << endl;
-                    }
-                    finalize();
+                    QCERR("qvec size error the size of qvec must be 2");
+                    throw invalid_argument("qvec size error the size of qvec must be 2");
                 }
 
-                int main() {
-                    bool fx0 = 0, fx1 = 0;
-                        cout << "input the input function" << endl
-                            << "The function has a boolean input" << endl
-                            << "and has a boolean output" << endl
-                            << "f(0)= (0/1)?";
-                        cin >> fx0;
-                        cout << "f(1)=(0/1)?";
-                        cin >> fx1;
-                        std::vector<bool> oracle_function({ fx0,fx1 });
-                        cout << "Programming the circuit..." << endl;
-                        two_qubit_deutsch_jozsa_algorithm(oracle_function);
+                auto oracle = generate_two_qubit_oracle(boolean_function);
+                QProg prog;
+                prog << Deutsch_Jozsa_algorithm({ qvec[0] }, qvec[1], { c }, oracle);
+
+                /* To Print The Circuit */
+                /*
+                extern QuantumMachine* global_quantum_machine;
+                cout << transformQProgToQRunes(prog, global_quantum_machine) << endl;
+                */
+
+                directlyRun(prog);
+                if (c.eval() == false)
+                {
+                    cout << "Constant function!" << endl;
                 }
+                else if (c.eval() == true)
+                {
+                    cout << "Balanced function!" << endl;
+                }
+                finalize();
+            }
+
+            int main() {
+                bool fx0 = 0, fx1 = 0;
+                    cout << "input the input function" << endl
+                        << "The function has a boolean input" << endl
+                        << "and has a boolean output" << endl
+                        << "f(0)= (0/1)?";
+                    cin >> fx0;
+                    cout << "f(1)=(0/1)?";
+                    cin >> fx1;
+                    std::vector<bool> oracle_function({ fx0,fx1 });
+                    cout << "Programming the circuit..." << endl;
+                    two_qubit_deutsch_jozsa_algorithm(oracle_function);
+            }
 
 6.2.3 Deutsch–Jozsa算法小结
 -------------------------------
