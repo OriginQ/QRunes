@@ -21,7 +21,7 @@ help:
 .PHONY: build clean
 
 build:
-	pip install sphinxcontrib-contentui
+	pip install sphinx-tabs
 	sphinx-build -E -n -W docs out
 
 clean:
