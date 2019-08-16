@@ -18,11 +18,10 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-
 .PHONY: build clean
 
 build:
-	pip install sphinx-tabs
+	pip install sphinxcontrib-contentui
 	sphinx-build -E -n -W docs out
 
 clean:

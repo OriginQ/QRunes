@@ -131,161 +131,165 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
 
 下面给出 QRunes 实现 Bernstein-Vazirani 算法的代码示例：
 
-.. tabs::
+.. content-tabs::
 
-   .. code-tab:: wangbadan
+        .. tab-container:: Python
+            :title: Python
 
-         @settings:
-            language = Python;
-            autoimport = True;
-            compile_only = False;
+            .. code-block:: python
 
-        @qcodes:
-        circuit<vector<qubit>,qubit> generate_bv_oracle(vector<bool> oracle_function){
-            return lambda (vector<qubit> qVec, qubit qu): {
-                let cd = oracle_function.length();
+                @settings:
+                    language = Python;
+                    autoimport = True;
+                    compile_only = False;
 
-                for(let i = 0: 1: cd){
-                    if(oracle_function[i]){
-                        CNOT(qVec[i], qu);
-                    }
+                @qcodes:
+                circuit<vector<qubit>,qubit> generate_bv_oracle(vector<bool> oracle_function){
+                    return lambda (vector<qubit> qVec, qubit qu): {
+                        let cd = oracle_function.length();
 
+                        for(let i = 0: 1: cd){
+                            if(oracle_function[i]){
+                                CNOT(qVec[i], qu);
+                            }
+
+                        }
+                    };
                 }
-            };
-        }
 
-        BV_QProg(vector<qubit> qVec, vector<cbit> cVec, vector<bool> a, circuit<vector<qubit>,qubit> oracle){
+                BV_QProg(vector<qubit> qVec, vector<cbit> cVec, vector<bool> a, circuit<vector<qubit>,qubit> oracle){
 
-            if(qVec.length() != (a.length()+1)){
-                let cd = qVec.length();
-                X(qVec[cd-1]);
-                apply_QGate(qVec, H);
-                oracle(qVec, qVec[cd - 1]);
+                    if(qVec.length() != (a.length()+1)){
+                        let cd = qVec.length();
+                        X(qVec[cd-1]);
+                        apply_QGate(qVec, H);
+                        oracle(qVec, qVec[cd - 1]);
 
-                qVec.remove(0);
+                        qVec.remove(0);
 
-                apply_QGate(qVec, H);
-                measure_all(qVec, cVec);
-            }
-        }
-        @script:
-        import sys
-        if __name__ == '__main__':
-            print('Bernstein Vazirani Algorithm')
-            print('f(x)=a*x+b')
-            input_a = input('input a\n')
-            a = []
-            for i in input_a:
-                if i == '0':
-                    a.append(0)
-                else:
-                    a.append(1)
-            b = int(input('input b\n'))
-            print('a=\t%s' %(int(input_a)))
-            print('b=\t%s' %(int(bool(b))))
-            print('Programming the circuit...')
-
-            init(QMachineType.CPU_SINGLE_THREAD)
-            qubit_num = len(a)
-            cbit_num = qubit_num
-            # Initialization quantum bits
-            qv = qAlloc_many(qubit_num+1)
-            cv = cAlloc_many(cbit_num)
-
-            if len(qv) != (len(a)+1):
-                print("error: param error")
-                sys.exit(1)
-            bvAlgorithm = BV_QProg(qv, cv, a, b)
-            directly_run(bvAlgorithm)
-
-            print('a=\t', end='')
-            for c in cv:
-                print(c.eval())
-            print('b=\t%s' %(int(bool(b))))
-
-            finalize()
-
-   .. code-tab:: laowang
-
-        @settings:
-            language = C++;
-            autoimport = True;
-            compile_only = False;
-            
-        @qcodes:
-        circuit<vector<qubit>,qubit> generate_bv_oracle(vector<bool> oracle_function){
-            return lambda (vector<qubit> qVec, qubit qu): {
-                let cd = oracle_function.length();
-
-                for(let i = 0: 1: cd){
-                    if(oracle_function[i]){
-                        CNOT(qVec[i], qu);
+                        apply_QGate(qVec, H);
+                        measure_all(qVec, cVec);
                     }
                 }
-            };
-        }
+                @script:
+                import sys
+                if __name__ == '__main__':
+                    print('Bernstein Vazirani Algorithm')
+                    print('f(x)=a*x+b')
+                    input_a = input('input a\n')
+                    a = []
+                    for i in input_a:
+                        if i == '0':
+                            a.append(0)
+                        else:
+                            a.append(1)
+                    b = int(input('input b\n'))
+                    print('a=\t%s' %(int(input_a)))
+                    print('b=\t%s' %(int(bool(b))))
+                    print('Programming the circuit...')
 
-        BV_QProg(vector<qubit> qVec, vector<cbit> cVec, vector<bool> a, circuit<vector<qubit>,qubit> oracle){
+                    init(QMachineType.CPU_SINGLE_THREAD)
+                    qubit_num = len(a)
+                    cbit_num = qubit_num
+                    # Initialization quantum bits
+                    qv = qAlloc_many(qubit_num+1)
+                    cv = cAlloc_many(cbit_num)
 
-            if(qVec.length() != (a.length()+1)){
-                let cd = qVec.length();
-                X(qVec[cd-1]);
-                apply_QGate(qVec, H);
-                oracle(qVec, qVec[cd - 1]);
+                    if len(qv) != (len(a)+1):
+                        print("error: param error")
+                        sys.exit(1)
+                    bvAlgorithm = BV_QProg(qv, cv, a, b)
+                    directly_run(bvAlgorithm)
 
-                qVec.remove(0);
+                    print('a=\t', end='')
+                    for c in cv:
+                        print(c.eval())
+                    print('b=\t%s' %(int(bool(b))))
 
-                apply_QGate(qVec, H);
-                measure_all(qVec, cVec);
-            }
+                    finalize()
 
+        .. tab-container:: Cpp
+            :title: Cpp
 
-            
+            .. code-block:: Python
 
-        }
-        @script:
-        int main() {
-            cout << "Bernstein Vazirani Algorithm\n" << endl;
-            cout << "f(x)=a*x+b\n" << endl;
-            cout << "input a" << endl;
-            string stra;
-            cin >> stra;
-            vector<bool> a;
-            for (auto iter = stra.begin(); iter != stra.end(); iter++)
-            {
-                if (*iter == '0')
-                {
-                    a.push_back(0);
+                @settings:
+                    language = C++;
+                    autoimport = True;
+                    compile_only = False;
+                    
+                @qcodes:
+                circuit<vector<qubit>,qubit> generate_bv_oracle(vector<bool> oracle_function){
+                    return lambda (vector<qubit> qVec, qubit qu): {
+                        let cd = oracle_function.length();
+
+                        for(let i = 0: 1: cd){
+                            if(oracle_function[i]){
+                                CNOT(qVec[i], qu);
+                            }
+                        }
+                    };
                 }
-                else
-                {
-                    a.push_back(1);
-                }
-            }
-            cout << "input b" << endl;
-            bool b;
-            cin >> b;
-            cout << "a=\t" << stra << endl;
-            cout << "b=\t" << b << endl;
-            cout << " Programming the circuit..." << endl;
-            size_t qubitnum = a.size();
-            init();
-            vector<Qubit*> qVec = qAllocMany(qubitnum+1) ;
-            auto cVec = cAllocMany(qubitnum);
-            auto oracle = generate_bv_oracle(a);
-            auto bvAlgorithm = BV_QProg(qVec, cVec, a, oracle);
-            directlyRun(bvAlgorithm);
-            string measure;
-            cout << "a=\t";
-            for (auto iter = cVec.begin(); iter != cVec.end(); iter++)
-            {
-                cout << (*iter).eval();
-            }
-            cout << "\n" << "b=\t" << b << endl;
-            finalize();
-        }
 
-               
+                BV_QProg(vector<qubit> qVec, vector<cbit> cVec, vector<bool> a, circuit<vector<qubit>,qubit> oracle){
+
+                    if(qVec.length() != (a.length()+1)){
+                        let cd = qVec.length();
+                        X(qVec[cd-1]);
+                        apply_QGate(qVec, H);
+                        oracle(qVec, qVec[cd - 1]);
+
+                        qVec.remove(0);
+
+                        apply_QGate(qVec, H);
+                        measure_all(qVec, cVec);
+                    }
+
+
+                    
+
+                }
+                @script:
+                int main() {
+                    cout << "Bernstein Vazirani Algorithm\n" << endl;
+                    cout << "f(x)=a*x+b\n" << endl;
+                    cout << "input a" << endl;
+                    string stra;
+                    cin >> stra;
+                    vector<bool> a;
+                    for (auto iter = stra.begin(); iter != stra.end(); iter++)
+                    {
+                        if (*iter == '0')
+                        {
+                            a.push_back(0);
+                        }
+                        else
+                        {
+                            a.push_back(1);
+                        }
+                    }
+                    cout << "input b" << endl;
+                    bool b;
+                    cin >> b;
+                    cout << "a=\t" << stra << endl;
+                    cout << "b=\t" << b << endl;
+                    cout << " Programming the circuit..." << endl;
+                    size_t qubitnum = a.size();
+                    init();
+                    vector<Qubit*> qVec = qAllocMany(qubitnum+1) ;
+                    auto cVec = cAllocMany(qubitnum);
+                    auto oracle = generate_bv_oracle(a);
+                    auto bvAlgorithm = BV_QProg(qVec, cVec, a, oracle);
+                    directlyRun(bvAlgorithm);
+                    string measure;
+                    cout << "a=\t";
+                    for (auto iter = cVec.begin(); iter != cVec.end(); iter++)
+                    {
+                        cout << (*iter).eval();
+                    }
+                    cout << "\n" << "b=\t" << b << endl;
+                    finalize();
+                }
 
 
 6.8.3 Bernstein-Vazirani算法小结

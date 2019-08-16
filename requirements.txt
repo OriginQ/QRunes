@@ -1,1 +1,0 @@
-https://krpc.s3.amazonaws.com/sphinx-tabs-1.1.12.tar.gz
