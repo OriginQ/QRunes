@@ -97,243 +97,236 @@
 
 下面给出 QRunes 实现 Grover 算法的代码示例：
 
-.. content-tabs::
+.. tabs::
 
-        .. tab-container:: Python
-            :title: Python
+   .. code-tab:: python
 
-            .. code-block:: python
+        @settings:
+            language = Python;
+            autoimport = True;
+            compile_only = False;
 
-                @settings:
-                    language = Python;
-                    autoimport = True;
-                    compile_only = False;
-
-                @qcodes:
-                circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int target){
-                    return lambda (vector<qubit> qvec,qubit qu):{
-                        if(target == 0){
-                            X(qvec[0]);
-                            X(qvec[1]);
-                            Toffoli(qvec[0], qvec[1], qu);
-                            X(qvec[0]);
-                            X(qvec[1]);
-                        }
-                        if(target == 1){
-                            X(qvec[0]);
-                            Toffoli(qvec[0], qvec[1], qu);
-                            X(qvec[0]);
-                        }
-                        if(target == 2){
-                            X(qvec[1]);
-                            Toffoli(qvec[0], qvec[1], qu);
-                            X(qvec[1]);
-                        }
-                        if(target == 3){
-                            Toffoli(qvec[0], qvec[1], qu);
-                        }
-                    };
+        @qcodes:
+        circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int target){
+            return lambda (vector<qubit> qvec,qubit qu):{
+                if(target == 0){
+                    X(qvec[0]);
+                    X(qvec[1]);
+                    Toffoli(qvec[0], qvec[1], qu);
+                    X(qvec[0]);
+                    X(qvec[1]);
                 }
-
-                circuit diffusion_operator(vector<qubit> qvec){
-                    vector<qubit> controller;
-                    controller = qvec[0:qvec.length()-1];
-                    apply_QGate(qvec, H);
-                    apply_QGate(qvec, X);
-                    Z(qvec[qvec.length()-1]).control(controller);
-                    apply_QGate(qvec, X);
-                    apply_QGate(qvec, H);
+                if(target == 1){
+                    X(qvec[0]);
+                    Toffoli(qvec[0], qvec[1], qu);
+                    X(qvec[0]);
                 }
-
-                Grover_algorithm(vector<qubit> working_qubit, qubit ancilla, vector<cbit> cvec,
-                                    circuit<vector<qubit>,qubit> oracle, int repeate){
-
-                    X(ancilla);
-                    apply_QGate(working_qubit, H);
-                    H(ancilla);
-
-                    if(repeate == 0){
-                        let sqrtN = 1 << (working_qubit / 2);
-                        repeate = 100 * sqrtN;
-                    }
-
-                    for(let i = 0 : 1 : repeate){
-                        oracle(working_qubit,ancilla);
-                        diffusion_operator(working_qubit);
-                    }
-
-                    measure_all(working_qubit,cvec);
+                if(target == 2){
+                    X(qvec[1]);
+                    Toffoli(qvec[0], qvec[1], qu);
+                    X(qvec[1]);
                 }
-
-                @script:
-                if __name__ == '__main__':
-                    condition = 1
-                    while condition == 1:
-                        print("input the input function")
-                        print("The function has a boolean input")
-                        print("and has a boolean output")
-                        print("target=(0/1/2/3)?")
-                        target = int(input())
-                        print("Programming the circuit...")
-                        oracle = generate_3_qubit_oracle(target)
-
-                        qvm = init_quantum_machine(QMachineType.CPU_SINGLE_THREAD)
-
-                        qubit_number = 3
-
-                        working_qubit = qvm.qAlloc_many(qubit_number-1)
-
-                        ancilla = qvm.qAlloc()
-
-                        cbitnum = 2
-                        cvec = qvm.cAlloc_many(cbitnum)
-
-                        repeate = 1
-
-                        prog = Grover_algorithm(working_qubit, ancilla, cvec, oracle, repeate)
-
-                        # To Print The Circuit
-                        print(to_QRunes(prog, qvm))
-
-                        resultMap = directly_run(prog)
-
-                        if resultMap["c0"]:
-                            if resultMap["c1"]:
-                                print("target number is 3 !")
-                            else:
-                                print("target number is 2 !")
-                        else:
-                            if resultMap["c1"]:
-                                print("target number is 1 !")
-                            else:
-                                print("target number is 0 !")
-                        destroy_quantum_machine(qvm)
-
-        .. tab-container:: Cpp
-            :title: Cpp
-
-            .. code-block:: Python
-
-                @settings:
-                    language = C++;
-                    autoimport = True;
-                    compile_only = False;
-
-                @qcodes:
-                circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int target){
-                    return lambda (vector<qubit> qvec,qubit qu):{
-                        if(target == 0){
-                            X(qvec[0]);
-                            X(qvec[1]);
-                            Toffoli(qvec[0], qvec[1], qu);
-                            X(qvec[0]);
-                            X(qvec[1]);
-                        }
-                        if(target == 1){
-                            X(qvec[0]);
-                            Toffoli(qvec[0], qvec[1], qu);
-                            X(qvec[0]);
-                        }
-                        if(target == 2){
-                            X(qvec[1]);
-                            Toffoli(qvec[0], qvec[1], qu);
-                            X(qvec[1]);
-                        }
-                        if(target == 3){
-                            Toffoli(qvec[0], qvec[1], qu);
-                        }
-                    };
+                if(target == 3){
+                    Toffoli(qvec[0], qvec[1], qu);
                 }
+            };
+        }
 
-                circuit diffusion_operator(vector<qubit> qvec){
-                    vector<qubit> controller;
-                    controller = qvec[0:qvec.length()-1];
-                    apply_QGate(qvec, H);
-                    apply_QGate(qvec, X);
-                    Z(qvec[qvec.length()-1]).control(controller);
-                    apply_QGate(qvec, X);
-                    apply_QGate(qvec, H);
+        circuit diffusion_operator(vector<qubit> qvec){
+            vector<qubit> controller;
+            controller = qvec[0:qvec.length()-1];
+            apply_QGate(qvec, H);
+            apply_QGate(qvec, X);
+            Z(qvec[qvec.length()-1]).control(controller);
+            apply_QGate(qvec, X);
+            apply_QGate(qvec, H);
+        }
+
+        Grover_algorithm(vector<qubit> working_qubit, qubit ancilla, vector<cbit> cvec,
+                            circuit<vector<qubit>,qubit> oracle, int repeate){
+
+            X(ancilla);
+            apply_QGate(working_qubit, H);
+            H(ancilla);
+
+            if(repeate == 0){
+                let sqrtN = 1 << (working_qubit / 2);
+                repeate = 100 * sqrtN;
+            }
+
+            for(let i = 0 : 1 : repeate){
+                oracle(working_qubit,ancilla);
+                diffusion_operator(working_qubit);
+            }
+
+            measure_all(working_qubit,cvec);
+        }
+
+        @script:
+        if __name__ == '__main__':
+            condition = 1
+            while condition == 1:
+                print("input the input function")
+                print("The function has a boolean input")
+                print("and has a boolean output")
+                print("target=(0/1/2/3)?")
+                target = int(input())
+                print("Programming the circuit...")
+                oracle = generate_3_qubit_oracle(target)
+
+                qvm = init_quantum_machine(QMachineType.CPU_SINGLE_THREAD)
+
+                qubit_number = 3
+
+                working_qubit = qvm.qAlloc_many(qubit_number-1)
+
+                ancilla = qvm.qAlloc()
+
+                cbitnum = 2
+                cvec = qvm.cAlloc_many(cbitnum)
+
+                repeate = 1
+
+                prog = Grover_algorithm(working_qubit, ancilla, cvec, oracle, repeate)
+
+                # To Print The Circuit
+                print(to_QRunes(prog, qvm))
+
+                resultMap = directly_run(prog)
+
+                if resultMap["c0"]:
+                    if resultMap["c1"]:
+                        print("target number is 3 !")
+                    else:
+                        print("target number is 2 !")
+                else:
+                    if resultMap["c1"]:
+                        print("target number is 1 !")
+                    else:
+                        print("target number is 0 !")
+                destroy_quantum_machine(qvm)
+
+   .. code-tab:: c++
+
+        @settings:
+            language = C++;
+            autoimport = True;
+            compile_only = False;
+
+        @qcodes:
+        circuit<vector<qubit>,qubit> generate_3_qubit_oracle(int target){
+            return lambda (vector<qubit> qvec,qubit qu):{
+                if(target == 0){
+                    X(qvec[0]);
+                    X(qvec[1]);
+                    Toffoli(qvec[0], qvec[1], qu);
+                    X(qvec[0]);
+                    X(qvec[1]);
                 }
-
-                Grover_algorithm(vector<qubit> working_qubit, qubit ancilla, vector<cbit> cvec,
-                                    circuit<vector<qubit>,qubit> oracle, int repeate){
-
-                    X(ancilla);
-                    apply_QGate(working_qubit, H);
-                    H(ancilla);
-
-                    if(repeate == 0){
-                        let sqrtN = 1 << (working_qubit.size() / 2);
-                        repeate = 100 * sqrtN;
-                    }
-
-                    for(let i = 0 : 1 : repeate){
-                        oracle(working_qubit,ancilla);
-                        diffusion_operator(working_qubit);
-                    }
-
-                    measure_all(working_qubit,cvec);
+                if(target == 1){
+                    X(qvec[0]);
+                    Toffoli(qvec[0], qvec[1], qu);
+                    X(qvec[0]);
                 }
+                if(target == 2){
+                    X(qvec[1]);
+                    Toffoli(qvec[0], qvec[1], qu);
+                    X(qvec[1]);
+                }
+                if(target == 3){
+                    Toffoli(qvec[0], qvec[1], qu);
+                }
+            };
+        }
+
+        circuit diffusion_operator(vector<qubit> qvec){
+            vector<qubit> controller;
+            controller = qvec[0:qvec.length()-1];
+            apply_QGate(qvec, H);
+            apply_QGate(qvec, X);
+            Z(qvec[qvec.length()-1]).control(controller);
+            apply_QGate(qvec, X);
+            apply_QGate(qvec, H);
+        }
+
+        Grover_algorithm(vector<qubit> working_qubit, qubit ancilla, vector<cbit> cvec,
+                            circuit<vector<qubit>,qubit> oracle, int repeate){
+
+            X(ancilla);
+            apply_QGate(working_qubit, H);
+            H(ancilla);
+
+            if(repeate == 0){
+                let sqrtN = 1 << (working_qubit.size() / 2);
+                repeate = 100 * sqrtN;
+            }
+
+            for(let i = 0 : 1 : repeate){
+                oracle(working_qubit,ancilla);
+                diffusion_operator(working_qubit);
+            }
+
+            measure_all(working_qubit,cvec);
+        }
 
 
-                @script:
-                int main()
+        @script:
+        int main()
+        {
+            while (1) {
+                int target;
+                cout << "input the input function" << endl
+                    << "The function has a boolean input" << endl
+                    << "and has a boolean output" << endl
+                    << "target=(0/1/2/3)?";
+                cin >> target;
+                cout << "Programming the oracle..." << endl;
+                Oracle<QVec, Qubit*> oracle = generate_3_qubit_oracle(target);
+
+                init(QMachineType::CPU_SINGLE_THREAD);
+
+                int qubit_number = 3;
+                vector<Qubit*> working_qubit = qAllocMany(qubit_number - 1);
+                Qubit* ancilla = qAlloc();
+
+                int cbitnum = 2;
+                vector<ClassicalCondition> cvec = cAllocMany(cbitnum);
+
+                auto prog = Grover_algorithm(working_qubit, ancilla, cvec, oracle, 1);
+
+                /* To Print The Circuit */
+
+                extern QuantumMachine* global_quantum_machine;
+                cout << transformQProgToQRunes(prog, global_quantum_machine) << endl;
+
+
+                auto resultMap = directlyRun(prog);
+                if (resultMap["c0"])
                 {
-                    while (1) {
-                        int target;
-                        cout << "input the input function" << endl
-                            << "The function has a boolean input" << endl
-                            << "and has a boolean output" << endl
-                            << "target=(0/1/2/3)?";
-                        cin >> target;
-                        cout << "Programming the oracle..." << endl;
-                        Oracle<QVec, Qubit*> oracle = generate_3_qubit_oracle(target);
-
-                        init(QMachineType::CPU_SINGLE_THREAD);
-
-                        int qubit_number = 3;
-                        vector<Qubit*> working_qubit = qAllocMany(qubit_number - 1);
-                        Qubit* ancilla = qAlloc();
-
-                        int cbitnum = 2;
-                        vector<ClassicalCondition> cvec = cAllocMany(cbitnum);
-
-                        auto prog = Grover_algorithm(working_qubit, ancilla, cvec, oracle, 1);
-
-                        /* To Print The Circuit */
-
-                        extern QuantumMachine* global_quantum_machine;
-                        cout << transformQProgToQRunes(prog, global_quantum_machine) << endl;
-
-
-                        auto resultMap = directlyRun(prog);
-                        if (resultMap["c0"])
-                        {
-                            if (resultMap["c1"])
-                            {
-                                cout << "target number is 3 !";
-                            }
-                            else
-                            {
-                                cout << "target number is 2 !";
-                            }
-                        }
-                        else
-                        {
-                            if (resultMap["c1"])
-                            {
-                                cout << "target number is 1 !";
-                            }
-                            else
-                            {
-                                cout << "target number is 0 !";
-                            }
-                        }
-                        finalize();
+                    if (resultMap["c1"])
+                    {
+                        cout << "target number is 3 !";
                     }
-                    return 0;
+                    else
+                    {
+                        cout << "target number is 2 !";
+                    }
                 }
-
+                else
+                {
+                    if (resultMap["c1"])
+                    {
+                        cout << "target number is 1 !";
+                    }
+                    else
+                    {
+                        cout << "target number is 0 !";
+                    }
+                }
+                finalize();
+            }
+            return 0;
+        }
 
 
 6.3.3 Grover算法小结
