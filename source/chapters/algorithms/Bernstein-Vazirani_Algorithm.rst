@@ -134,7 +134,6 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
 .. tabs::
 
    .. code-tab:: python
-
         @settings:
             language = Python;
             autoimport = True;
@@ -207,7 +206,7 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
 
    .. code-tab:: c++
 
-        @settings:
+       @settings:
             language = C++;
             autoimport = True;
             compile_only = False;
