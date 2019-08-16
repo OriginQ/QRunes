@@ -28,159 +28,154 @@ HHL的限制条件：
 
 下面给出 QRunes 实现 HHL 算法的代码示例：
 
-.. content-tabs::
+.. tabs::
 
-        .. tab-container:: Python
-            :title: Python
+   .. code-tab:: python
 
-            .. code-block:: python
+        @settings:
+            language = Python;
+            autoimport = True;
+            compile_only = False;
 
-                @settings:
-                    language = Python;
-                    autoimport = True;
-                    compile_only = False;
+        @qcodes:
+        circuit CRotate(vector<qubit> q) {
+            vector<qubit> controlVector;
+            controlVector.append(q[1]);
+            controlVector.append(q[2]);
+            X(q[1]);
+            RY(q[0], Pi).control(controlVector);
+            X(q[1]);
+            X(q[2]);
+            RY(q[0], Pi/3).control(controlVector);
+            X(q[2]);
+            RY(q[0], 0.679673818908).control(controlVector);  //arcsin(1/3)
+        }
 
-                @qcodes:
-                circuit CRotate(vector<qubit> q) {
-                    vector<qubit> controlVector;
-                    controlVector.append(q[1]);
-                    controlVector.append(q[2]);
-                    X(q[1]);
-                    RY(q[0], Pi).control(controlVector);
-                    X(q[1]);
-                    X(q[2]);
-                    RY(q[0], Pi/3).control(controlVector);
-                    X(q[2]);
-                    RY(q[0], 0.679673818908).control(controlVector);  //arcsin(1/3)
-                }
+        //Phase estimation algorithms
+        circuit hhlPse(vector<qubit> q) {
 
-                //Phase estimation algorithms
-                circuit hhlPse(vector<qubit> q) {
+            H(q[1]);
+            H(q[2]);
+            RZ(q[2], 0.75*Pi);
+            CU(Pi, 1.5*Pi, -0.5*Pi, Pi/2, q[2], q[3]);
+            RZ(q[1], 1.5*Pi);
+            CU(Pi, 1.5*Pi, -Pi, Pi/2, q[1], q[3]);
 
-                    H(q[1]);
-                    H(q[2]);
-                    RZ(q[2], 0.75*Pi);
-                    CU(Pi, 1.5*Pi, -0.5*Pi, Pi/2, q[2], q[3]);
-                    RZ(q[1], 1.5*Pi);
-                    CU(Pi, 1.5*Pi, -Pi, Pi/2, q[1], q[3]);
+            CNOT(q[1], q[2]);
+            CNOT(q[2], q[1]);
+            CNOT(q[1], q[2]);
 
-                    CNOT(q[1], q[2]);
-                    CNOT(q[2], q[1]);
-                    CNOT(q[1], q[2]);
+            H(q[2]);
+            CU(-0.25*Pi, -0.5*Pi, 0, 0, q[2], q[1]);
+            H(q[1]);
+        }
 
-                    H(q[2]);
-                    CU(-0.25*Pi, -0.5*Pi, 0, 0, q[2], q[1]);
-                    H(q[1]);
-                }
+        hhl_no_measure(vector<qubit> qlist, vector<cbit> clist) {
+            //phase estimation
+            hhlPse(qlist);
+            //rotate
+            CRotate(qlist);
+            measure(qlist[0], clist[0]);
+            qif (clist[0]) {
+                hhlPse(qlist).dagger();
+            }
+        }
 
-                hhl_no_measure(vector<qubit> qlist, vector<cbit> clist) {
-                    //phase estimation
-                    hhlPse(qlist);
-                    //rotate
-                    CRotate(qlist);
-                    measure(qlist[0], clist[0]);
-                    qif (clist[0]) {
-                        hhlPse(qlist).dagger();
-                    }
-                }
+        @script:
+        if __name__ == '__main__':
+            init(QMachineType.CPU_SINGLE_THREAD)
 
-                @script:
-                if __name__ == '__main__':
-                    init(QMachineType.CPU_SINGLE_THREAD)
+            qubit_num = 4
+            cbit_num = 2
+            qv = qAlloc_many(qubit_num)
+            cv = cAlloc_many(cbit_num)
+            hhlprog = QProg()
+            hhlprog.insert(RY(qv[3], 3.14159265358979/2))   #change vecotr b in equation Ax=b
+            hhlprog.insert(hhl_no_measure(qv, cv))
+            directly_run(hhlprog)
+            pmeas_q = []
+            pmeas_q.append(qv[3])
+            res = PMeasure_no_index(pmeas_q)
+            print('prob0: %s' %(res[0]))
+            print('prob1: %s' %(res[1]))
 
-                    qubit_num = 4
-                    cbit_num = 2
-                    qv = qAlloc_many(qubit_num)
-                    cv = cAlloc_many(cbit_num)
-                    hhlprog = QProg()
-                    hhlprog.insert(RY(qv[3], 3.14159265358979/2))   #change vecotr b in equation Ax=b
-                    hhlprog.insert(hhl_no_measure(qv, cv))
-                    directly_run(hhlprog)
-                    pmeas_q = []
-                    pmeas_q.append(qv[3])
-                    res = PMeasure_no_index(pmeas_q)
-                    print('prob0: %s' %(res[0]))
-                    print('prob1: %s' %(res[1]))
+            finalize()
 
-                    finalize()
+   .. code-tab:: c++
 
-        .. tab-container:: Cpp
-            :title: Cpp
+        @settings:
+            language = C++;
+            autoimport = True;
+            compile_only = False;
+            
+        @qcodes:
+        circuit CRotate(vector<qubit> q) {
+            vector<qubit> controlVector;
+            controlVector.append(q[1]);
+            controlVector.append(q[2]);
+            X(q[1]);
+            RY(q[0], Pi).control(controlVector);
+            X(q[1]);
+            X(q[2]);
+            RY(q[0], Pi/3).control(controlVector);
+            X(q[2]);
+            RY(q[0], 0.679673818908).control(controlVector);  //arcsin(1/3)
+        }
 
-            .. code-block:: Python
+        //Phase estimation algorithms
+        circuit hhlPse(vector<qubit> q) {
 
-                @settings:
-                    language = C++;
-                    autoimport = True;
-                    compile_only = False;
-                    
-                @qcodes:
-                circuit CRotate(vector<qubit> q) {
-                    vector<qubit> controlVector;
-                    controlVector.append(q[1]);
-                    controlVector.append(q[2]);
-                    X(q[1]);
-                    RY(q[0], Pi).control(controlVector);
-                    X(q[1]);
-                    X(q[2]);
-                    RY(q[0], Pi/3).control(controlVector);
-                    X(q[2]);
-                    RY(q[0], 0.679673818908).control(controlVector);  //arcsin(1/3)
-                }
+            H(q[1]);
+            H(q[2]);
+            RZ(q[2], 0.75*Pi);
+            CU(Pi, 1.5*Pi, -0.5*Pi, Pi/2, q[2], q[3]);
+            RZ(q[1], 1.5*Pi);
+            CU(Pi, 1.5*Pi, -Pi, Pi/2, q[1], q[3]);
 
-                //Phase estimation algorithms
-                circuit hhlPse(vector<qubit> q) {
+            CNOT(q[1], q[2]);
+            CNOT(q[2], q[1]);
+            CNOT(q[1], q[2]);
 
-                    H(q[1]);
-                    H(q[2]);
-                    RZ(q[2], 0.75*Pi);
-                    CU(Pi, 1.5*Pi, -0.5*Pi, Pi/2, q[2], q[3]);
-                    RZ(q[1], 1.5*Pi);
-                    CU(Pi, 1.5*Pi, -Pi, Pi/2, q[1], q[3]);
+            H(q[2]);
+            CU(-0.25*Pi, -0.5*Pi, 0, 0, q[2], q[1]);
+            H(q[1]);
+        }
 
-                    CNOT(q[1], q[2]);
-                    CNOT(q[2], q[1]);
-                    CNOT(q[1], q[2]);
+        hhl_no_measure(vector<qubit> qlist, vector<cbit> clist) {
+            //phase estimation
+            hhlPse(qlist);
+            //rotate
+            CRotate(qlist);
+            measure(qlist[0], clist[0]);
+            qif (clist[0]) {
+                hhlPse(qlist).dagger();
+            }
+        }
+        @script:
+        int main() {
+            map<string, bool> temp;
+            int x0 = 0;
+            int x1 = 0;
 
-                    H(q[2]);
-                    CU(-0.25*Pi, -0.5*Pi, 0, 0, q[2], q[1]);
-                    H(q[1]);
-                }
+            init(QMachineType::CPU);
+            int qubit_number = 4;
+            vector<Qubit*> qv = qAllocMany(qubit_number);
+            int cbitnum = 2;
+            vector<ClassicalCondition> cv = cAllocMany(2);
 
-                hhl_no_measure(vector<qubit> qlist, vector<cbit> clist) {
-                    //phase estimation
-                    hhlPse(qlist);
-                    //rotate
-                    CRotate(qlist);
-                    measure(qlist[0], clist[0]);
-                    qif (clist[0]) {
-                        hhlPse(qlist).dagger();
-                    }
-                }
-                @script:
-                int main() {
-                    map<string, bool> temp;
-                    int x0 = 0;
-                    int x1 = 0;
+            auto hhlprog = CreateEmptyQProg();
+            hhlprog << RY(qv[3], PI / 2); //  change vecotr b in equation Ax=b
+            hhlprog << hhl_no_measure(qv, cv);
+            directlyRun(hhlprog);
+            QVec pmeas_q;
+            pmeas_q.push_back(qv[3]);
+            vector<double> s = PMeasure_no_index(pmeas_q);
 
-                    init(QMachineType::CPU);
-                    int qubit_number = 4;
-                    vector<Qubit*> qv = qAllocMany(qubit_number);
-                    int cbitnum = 2;
-                    vector<ClassicalCondition> cv = cAllocMany(2);
+            cout << "prob0:" << s[0] << endl;
+            cout << "prob1:" << s[1] << endl;
+            finalize();
+        }
 
-                    auto hhlprog = CreateEmptyQProg();
-                    hhlprog << RY(qv[3], PI / 2); //  change vecotr b in equation Ax=b
-                    hhlprog << hhl_no_measure(qv, cv);
-                    directlyRun(hhlprog);
-                    QVec pmeas_q;
-                    pmeas_q.push_back(qv[3]);
-                    vector<double> s = PMeasure_no_index(pmeas_q);
-
-                    cout << "prob0:" << s[0] << endl;
-                    cout << "prob1:" << s[1] << endl;
-                    finalize();
-                }
 
 6.4.3 HHL算法小结
 -------------------
