@@ -109,225 +109,220 @@ Simon问题(s=11）的线路图设计参考图：
 下面给出 QRunes 实现 Simon 算法的代码示例：
 *******************************************
 
-.. content-tabs::
+.. tabs::
 
-        .. tab-container:: Python
-            :title: Python
+   .. code-tab:: python
 
-            .. code-block:: python
+        @settings:
+            language = Python;
+            autoimport = True;
+            compile_only = False;
 
-                @settings:
-                    language = Python;
-                    autoimport = True;
-                    compile_only = False;
+        @qcodes:
+        circuit controlfunc(vector<qubit> qvec, int index, int value) {
+            let cd = qvec.length() / 2;
+            vector<qubit> qvtemp;
+            qvtemp = qvec[0:cd];
+            if (index == 1) {
+                X(qvec[0]);
+            } else if (index == 2) {
+                X(qvec[1]);
+            } else if (index == 0) {
+                X(qvec[0]);
+                X(qvec[1]);
+            }
 
-                @qcodes:
-                circuit controlfunc(vector<qubit> qvec, int index, int value) {
-                    let cd = qvec.length() / 2;
-                    vector<qubit> qvtemp;
-                    qvtemp = qvec[0:cd];
-                    if (index == 1) {
-                        X(qvec[0]);
-                    } else if (index == 2) {
-                        X(qvec[1]);
-                    } else if (index == 0) {
-                        X(qvec[0]);
-                        X(qvec[1]);
-                    }
+            if (value == 1) {
+                X(qvec[3]).control(qvtemp);
+            } else if (value == 2) {
+                X(qvec[2]).control(qvtemp);
+            } else if (value == 3) {
+                X(qvec[2]).control(qvtemp);
+                X(qvec[3]).control(qvtemp);
+            }
 
-                    if (value == 1) {
-                        X(qvec[3]).control(qvtemp);
-                    } else if (value == 2) {
-                        X(qvec[2]).control(qvtemp);
-                    } else if (value == 3) {
-                        X(qvec[2]).control(qvtemp);
-                        X(qvec[3]).control(qvtemp);
-                    }
+            if (index == 1) {
+                X(qvec[0]);
+            } else if (index == 2) {
+                X(qvec[1]);
+            } else if (index == 0) {
+                X(qvec[0]);
+                X(qvec[1]);
+            }
+        }
 
-                    if (index == 1) {
-                        X(qvec[0]);
-                    } else if (index == 2) {
-                        X(qvec[1]);
-                    } else if (index == 0) {
-                        X(qvec[0]);
-                        X(qvec[1]);
-                    }
+        circuit oraclefunc(vector<qubit> qvec, vector<int> funvalue) {
+            let cd = qvec.length()/2;
+            for (let i=0: 1: 4){
+                let value = funvalue[i];
+                controlfunc(qvec, i, value);
+            }
+        }
+
+        Simon_QProg(vector<qubit> qvec, vector<cbit> cvec, vector<int> funvalue) {
+            let cd = cvec.length();
+            for (let i=0: 1: cd) {
+                H(qvec[i]);
+            }
+            oraclefunc(qvec, funvalue);
+            for (let i=0: 1: cd) {
+                H(qvec[i]);
+            }
+            for (let i=0: 1: cd) {
+                measure(qvec[i], cvec[i]);
+            }
+        }
+
+        @script:
+        if __name__ == '__main__':
+            print('4-qubit Simon Algorithm')
+            print('f(x)=f(y)\t x+y=s')
+            print('input f(x),f(x):[0,3]')
+            func_value = []
+            func_value.append(int(input('input f(0):\n')))
+            func_value.append(int(input('input f(1):\n')))
+            func_value.append(int(input('input f(2):\n')))
+            func_value.append(int(input('input f(3):\n')))
+            print('f(0)=%d' %(func_value[0]))
+            print('f(1)=%d' %(func_value[1]))
+            print('f(2)=%d' %(func_value[2]))
+            print('f(3)=%d' %(func_value[3]))
+            print('Programming the circuit...')
+
+            init(QMachineType.CPU_SINGLE_THREAD)
+            
+            qubit_num = 4
+            cbit_num = 2
+            # Initialization of 4 quantum bits
+            qv = qAlloc_many(qubit_num)
+            cv = cAlloc_many(cbit_num)
+            simonAlgorithm = Simon_QProg(qv, cv, func_value)
+
+            result = []
+            for i in range(0, 20, 1):
+                re = directly_run(simonAlgorithm)
+                result.append(cv[0].eval()*2 + cv[1].eval())
+            if 3 in result:
+                if 2 in result:
+                    print('s=00')
+                else:
+                    print('s=11')
+            elif 2 in result:
+                print('s=01')
+            elif 1 in result:
+                print('s=10')
+
+            finalize()
+
+
+   .. code-tab:: c++
+
+        @settings:
+            language = C++;
+            autoimport = True;
+            compile_only = False;
+            
+        @qcodes:
+        circuit controlfunc(vector<qubit> qvec, int index, int value) {
+            let cd = qvec.length() / 2;
+            vector<qubit> qvtemp;
+            qvtemp = qvec[0:cd];
+            if (index == 1) {
+                X(qvec[0]);
+            } else if (index == 2) {
+                X(qvec[1]);
+            } else if (index == 0) {
+                X(qvec[0]);
+                X(qvec[1]);
+            }
+
+            if (value == 1) {
+                X(qvec[3]).control(qvtemp);
+            } else if (value == 2) {
+                X(qvec[2]).control(qvtemp);
+            } else if (value == 3) {
+                X(qvec[2]).control(qvtemp);
+                X(qvec[3]).control(qvtemp);
+            }
+
+            if (index == 1) {
+                X(qvec[0]);
+            } else if (index == 2) {
+                X(qvec[1]);
+            } else if (index == 0) {
+                X(qvec[0]);
+                X(qvec[1]);
+            }
+        }
+
+        circuit oraclefunc(vector<qubit> qvec, vector<int> funvalue) {
+            let cd = qvec.length()/2;
+            for (let i=0: 1: 4){
+                let value = funvalue[i];
+                controlfunc(qvec, i, value);
+            }
+        }
+
+        Simon_QProg(vector<qubit> qvec, vector<cbit> cvec, vector<int> funvalue) {
+            let cd = cvec.length();
+            for (let i=0: 1: cd) {
+                H(qvec[i]);
+            }
+            oraclefunc(qvec, funvalue);
+            for (let i=0: 1: cd) {
+                H(qvec[i]);
+            }
+            for (let i=0: 1: cd) {
+                measure(qvec[i], cvec[i]);
+            }
+        }
+        @script:
+        int main() {
+            cout << "4-qubit Simon Algorithm\n" << endl;
+            cout << "f(x)=f(y)\t x+y=s" << endl;
+            cout << "input f(x),f(x):[0,3]" << endl;
+            vector<int> funcvalue(4, 0);
+            cout << "input f(0):" << endl;
+            cin >> funcvalue[0];
+            cout << "input f(1):" << endl;
+            cin >> funcvalue[1];
+            cout << "input f(2):" << endl;
+            cin >> funcvalue[2];
+            cout << "input f(3):" << endl;
+            cin >> funcvalue[3];
+            cout << "f(0)=" << funcvalue[0] << endl;
+            cout << "f(1)=" << funcvalue[1] << endl;
+            cout << "f(2)=" << funcvalue[2] << endl;
+            cout << "f(3)=" << funcvalue[3] << endl;
+            cout << " Programming the circuit..." << endl;
+            init(QMachineType::CPU);
+            int qubit_num = 4;
+            int cbit_nun = 2;
+            QVec qVec = qAllocMany(4);
+            vector<ClassicalCondition> cVec = cAllocMany(2);
+            QProg  simonAlgorithm = Simon_QProg(qVec, cVec, funcvalue);
+            vector<int> result(20);
+
+            for (auto i = 0; i < 20; i++) {
+                directlyRun(simonAlgorithm);
+                result[i] = cVec[0].eval() * 2 + cVec[1].eval();
+            }
+            if (find(result.begin(), result.end(), 3) != result.end()) {
+                if (find(result.begin(), result.end(), 2) != result.end()) {
+                    cout << "s=00" << endl;
+                } else {
+                    cout << "s=11" << endl;
                 }
 
-                circuit oraclefunc(vector<qubit> qvec, vector<int> funvalue) {
-                    let cd = qvec.length()/2;
-                    for (let i=0: 1: 4){
-                        let value = funvalue[i];
-                        controlfunc(qvec, i, value);
-                    }
-                }
-
-                Simon_QProg(vector<qubit> qvec, vector<cbit> cvec, vector<int> funvalue) {
-                    let cd = cvec.length();
-                    for (let i=0: 1: cd) {
-                        H(qvec[i]);
-                    }
-                    oraclefunc(qvec, funvalue);
-                    for (let i=0: 1: cd) {
-                        H(qvec[i]);
-                    }
-                    for (let i=0: 1: cd) {
-                        measure(qvec[i], cvec[i]);
-                    }
-                }
-
-                @script:
-                if __name__ == '__main__':
-                    print('4-qubit Simon Algorithm')
-                    print('f(x)=f(y)\t x+y=s')
-                    print('input f(x),f(x):[0,3]')
-                    func_value = []
-                    func_value.append(int(input('input f(0):\n')))
-                    func_value.append(int(input('input f(1):\n')))
-                    func_value.append(int(input('input f(2):\n')))
-                    func_value.append(int(input('input f(3):\n')))
-                    print('f(0)=%d' %(func_value[0]))
-                    print('f(1)=%d' %(func_value[1]))
-                    print('f(2)=%d' %(func_value[2]))
-                    print('f(3)=%d' %(func_value[3]))
-                    print('Programming the circuit...')
-
-                    init(QMachineType.CPU_SINGLE_THREAD)
-                    
-                    qubit_num = 4
-                    cbit_num = 2
-                    # Initialization of 4 quantum bits
-                    qv = qAlloc_many(qubit_num)
-                    cv = cAlloc_many(cbit_num)
-                    simonAlgorithm = Simon_QProg(qv, cv, func_value)
-
-                    result = []
-                    for i in range(0, 20, 1):
-                        re = directly_run(simonAlgorithm)
-                        result.append(cv[0].eval()*2 + cv[1].eval())
-                    if 3 in result:
-                        if 2 in result:
-                            print('s=00')
-                        else:
-                            print('s=11')
-                    elif 2 in result:
-                        print('s=01')
-                    elif 1 in result:
-                        print('s=10')
-
-                    finalize()
-
-        .. tab-container:: Cpp
-            :title: Cpp
-
-            .. code-block:: Python
-
-                @settings:
-                    language = C++;
-                    autoimport = True;
-                    compile_only = False;
-                    
-                @qcodes:
-                circuit controlfunc(vector<qubit> qvec, int index, int value) {
-                    let cd = qvec.length() / 2;
-                    vector<qubit> qvtemp;
-                    qvtemp = qvec[0:cd];
-                    if (index == 1) {
-                        X(qvec[0]);
-                    } else if (index == 2) {
-                        X(qvec[1]);
-                    } else if (index == 0) {
-                        X(qvec[0]);
-                        X(qvec[1]);
-                    }
-
-                    if (value == 1) {
-                        X(qvec[3]).control(qvtemp);
-                    } else if (value == 2) {
-                        X(qvec[2]).control(qvtemp);
-                    } else if (value == 3) {
-                        X(qvec[2]).control(qvtemp);
-                        X(qvec[3]).control(qvtemp);
-                    }
-
-                    if (index == 1) {
-                        X(qvec[0]);
-                    } else if (index == 2) {
-                        X(qvec[1]);
-                    } else if (index == 0) {
-                        X(qvec[0]);
-                        X(qvec[1]);
-                    }
-                }
-
-                circuit oraclefunc(vector<qubit> qvec, vector<int> funvalue) {
-                    let cd = qvec.length()/2;
-                    for (let i=0: 1: 4){
-                        let value = funvalue[i];
-                        controlfunc(qvec, i, value);
-                    }
-                }
-
-                Simon_QProg(vector<qubit> qvec, vector<cbit> cvec, vector<int> funvalue) {
-                    let cd = cvec.length();
-                    for (let i=0: 1: cd) {
-                        H(qvec[i]);
-                    }
-                    oraclefunc(qvec, funvalue);
-                    for (let i=0: 1: cd) {
-                        H(qvec[i]);
-                    }
-                    for (let i=0: 1: cd) {
-                        measure(qvec[i], cvec[i]);
-                    }
-                }
-                @script:
-                int main() {
-                    cout << "4-qubit Simon Algorithm\n" << endl;
-                    cout << "f(x)=f(y)\t x+y=s" << endl;
-                    cout << "input f(x),f(x):[0,3]" << endl;
-                    vector<int> funcvalue(4, 0);
-                    cout << "input f(0):" << endl;
-                    cin >> funcvalue[0];
-                    cout << "input f(1):" << endl;
-                    cin >> funcvalue[1];
-                    cout << "input f(2):" << endl;
-                    cin >> funcvalue[2];
-                    cout << "input f(3):" << endl;
-                    cin >> funcvalue[3];
-                    cout << "f(0)=" << funcvalue[0] << endl;
-                    cout << "f(1)=" << funcvalue[1] << endl;
-                    cout << "f(2)=" << funcvalue[2] << endl;
-                    cout << "f(3)=" << funcvalue[3] << endl;
-                    cout << " Programming the circuit..." << endl;
-                    init(QMachineType::CPU);
-                    int qubit_num = 4;
-                    int cbit_nun = 2;
-                    QVec qVec = qAllocMany(4);
-                    vector<ClassicalCondition> cVec = cAllocMany(2);
-                    QProg  simonAlgorithm = Simon_QProg(qVec, cVec, funcvalue);
-                    vector<int> result(20);
-
-                    for (auto i = 0; i < 20; i++) {
-                        directlyRun(simonAlgorithm);
-                        result[i] = cVec[0].eval() * 2 + cVec[1].eval();
-                    }
-                    if (find(result.begin(), result.end(), 3) != result.end()) {
-                        if (find(result.begin(), result.end(), 2) != result.end()) {
-                            cout << "s=00" << endl;
-                        } else {
-                            cout << "s=11" << endl;
-                        }
-
-                    }
-                    else if (find(result.begin(), result.end(), 2) != result.end()) {
-                        cout << "s=01" << endl;
-                    }
-                    else if (find(result.begin(), result.end(), 1) != result.end()) {
-                        cout << "s=10" << endl;
-                    }
-                    finalize();
-                }
+            }
+            else if (find(result.begin(), result.end(), 2) != result.end()) {
+                cout << "s=01" << endl;
+            }
+            else if (find(result.begin(), result.end(), 1) != result.end()) {
+                cout << "s=10" << endl;
+            }
+            finalize();
+        }
 
 
 
