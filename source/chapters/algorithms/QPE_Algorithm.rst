@@ -207,12 +207,10 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
 
         // Applying a controlled single operation
         circuit controlUnitaryPower(vector<qubit> qvec, qubit controlQubit, int min) {
-            circuit  qCircuit；
-            qCircuit.insert(unitarypower(qvec, min));
-            vector<qubit> cControlQubit;
-            cControlQubit.append(controlQubit);
-            qCircuit.control(cControlQubit);
+
+            unitarypower(qvec, min).control(controlQubit);
         }
+
 
         circuit QPE(vector<qubit> controlqvec, vector<qubit> targetqvec) {
             // A unified H-gate operation is added to controlqvec qubits, and N initial states are placed in superposition states.
