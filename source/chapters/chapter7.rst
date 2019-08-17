@@ -1,11 +1,30 @@
 第7章 QRunes类型系统
 ===========================
 
+至此，相信你已经对QRunes已经有了相对足够的认识了。对于QRunes更深层次的学习来说，如何理解QRunes的类型系统对于利用QRunes进行编程开发和对量子-经典混合编程的掌握是至关重要的。
+
+QRunes中的每一个变量，函数，函数参数，表达式都有自己的类型，类型可以确保程序编译的正常进行。
+
+QRunes的类型属于强类型，也是一种静态类型，即每一个对象都有自己的类型，且该类型在整个编码过程和编译运行时不会发生更改。
+说明：
+：：
+  1. 在定义变量时，量子类型和经典类型需指定具体的类型，辅助类型必须使用let关键字来指示编译器通过初始值来判定具体的辅助类型。
+  2. 当在定义形参变量时，所有变量必须指定其实际的类型。
+  3. 在声明函数时，必须指定函数的返回具体类型，如果不作指定，编译器会将该函数默认为返回值为qprog类型的量子类型函数；如果函数无返回值，则需指定函数的类型为void。
+
+在介绍QRunes的类型系统时，这里介绍的内容包括一下几种类型：
+
+::
+  1. Quantum Type。类型包括：qubit
+  2. Auxiliary Type。类型包括：int, double这些常规的，在量子计算框架中Host Computer支持的计算类型。
+  3. Classical Type。
+  4. Vector Type。
+  5. String Type。
 
 7.1 量子类型 Quantum Type
 ---------------------------
 
-量子类型的对象描述的是量子芯片上的量子比特，故量子类型是描述量子比特或者一组量子比特的方法。在QRunes中现支持qubit和qvec，分别表示一个量子位和一个量子位矢量。在量子器件中，量子类型的变量是到量子比特的映射，并且它可以直接用于量子门操作。如：
+量子类型的对象描述的是量子芯片上的量子比特，故量子类型是描述量子比特或者一组量子比特的方法。在QRunes中现支持qubit和通过vector构造的vector<qubit>，分别表示一个量子位和一个量子位矢量。在量子器件中，量子类型的变量是到量子比特的映射，并且它可以直接用于量子门操作。如：
 ::
   H(q); // q is a qubit.
   H(qs[0]); // qs is a qvec.
@@ -14,7 +33,7 @@
 
 量子类型另外一个常见的用法是作为量子函数中的传递参数。如：
 ::
-  fun(qubit q, qvec qs)
+  fun(qubit q, vector<qubit> qs)
   {
     /* use q and qs in quantum gates
     or function calls. */
@@ -31,15 +50,10 @@
   qubit q = qs[0];
   qvec qs1 = qs[0:3];
 
-在QRunes，表达式length（qvec）返回辅助经典类型从而表示向量大小，因为所有Qvec类型的长度都在量子程序的编译中确定，这为上述返回值的设计提供了理论基础。
+在QRunes，表达式length（qvec）返回辅助经典类型从而表示向量大小，因为所有Array类型的长度都在量子程序的编译中确定，这为上述返回值的设计提供了理论基础。
 
 
-
-7.2 量子线路类型 Quantum Circuit Type
-
-7.3 数组类型 Array Construct Type 
-
-7.4 辅助类型 Auxiliary Type 
+7.2 辅助类型 Auxiliary Type 
 ---------------------------
 
 辅助经典类型描述经典变量，这有助于我们构建量子程序。这些变量是在量子程序传输到量子设备之前确定的。在QBuilder系统中，未正式考虑辅助类型，相反，这些变量的处理由宿主语言或编程接口维护。这里我们只处理普通的数值类型和数组类型。如：
@@ -65,14 +79,7 @@
   RX(q[i],b);
 
 
-  
-
-
-
-
-
-
-7.5 经典类型 Classical Type
+7.3 经典类型 Classical Type
 ---------------------------
 
 经典类型处理量子计算机中的经典位或变量。在物理底层实现中，量子芯片并不单独工作，这是因为控制和测量信号由一组嵌入式设备处理，测量结果暂时保存在这些设备的内存中。本设计旨在实现量子程序的反馈控制，如qif和qwhile。量子比特是脆弱的，在纳秒到微秒的时间内会崩溃，这比量子比特系统执行反馈所需的时间要短得多。这要求我们使用嵌入式器件来实现量子芯片控制从而满足系统的反馈要求。
@@ -81,8 +88,8 @@
 
 ::
  
-   Measure(q,c);    // perform a measurement.
-   for (i = 0:len(q))   // measuring a qvec to a cvec.
+   measure(q,c);    // perform a measurement.
+   for (i = 0:1: q.length())   // measuring a qvec to a cvec.
        measure(q[i],c[i])
 
 
@@ -92,18 +99,32 @@
 
   C1 = C2;
   C2 = !C2;
-  Qif (C2) { // do something }
-  Qif (C1) { // C1 is the negative of C2 }
+  qif (C2) { // do something }
+  qif (C1) { // C1 is the negative of C2 }
 
 将常量赋给经典类型也是有效的,但我们必须小心，因为程序在传输到量子计算机之前，实际上并没有执行分配操作。反过来，辅助类型不能由经典类型指定，下面是一个例子：
 
 ::
  
  C1 = True
- Qif (C1) { // do something }
+ qif (C1) { // do something }
  let a = C1; // Bad assignment
 
 
+7.4 向量类型 Vector Type
+
+向量类型是一种数据结构，表示可以代表（存储）多个同种类型的对象的集合，并可以根据索引来进行检索这些对象。向量类型的对象类型为其组成中的对象的基本类型。向量类型的在构造时不需要指定其长度。
+
+向量类型的构造方式：
+
+1. vector <T> ivec; // T 可以是 AQC系统中的任何类型。
+2. let ivec = [1,2,3]; // 该方式仅可以支持辅助类型（Auxiliary Type）。
+
+Vector类型的用法及函数调用：
+  1. 通过下标获取向量中的元素：Iveco[i]。
+  2. length(): 返回向量的长度
+  3. append（t）:在向量的末尾增加一个元素。
+  3. pop(): 删除向量中的最后一个元素。
 
 
-7.6 量子程序类型 Quantum Prog Type
+7.5 字符串类型 String Type

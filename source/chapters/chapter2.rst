@@ -94,7 +94,7 @@ vector是同一种类型的对象的集合，每个对象都有一个对应的�
 
 ::
 
-    for (i = 0: 1: qs.size()) {
+    for (i = 0: 1: qs.length()) {
         H(qs[i]);
     }
 
@@ -298,7 +298,7 @@ QRunes中保留了一组词用作改语言的关键字。关键字不能用作�
   vector              S                         qif
   Pi                  Y                         qwhile 
   return              Z                         qelse
-  lambda
+  lambda              while
 ===============     =====================     ==================
 
 2.3.4 变量命名习惯
