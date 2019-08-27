@@ -184,8 +184,8 @@ Classical           logN              >=2log(N/2)       >=3log(N/3)       Ω(k l
                 prog = QProg()
                 temp = CoinFlip_Prog(prog, qv, cv, fx)
                 for i in range(0, 10, 1):
-                                out_come = CoinFlip_Prog(prog, qv, cv, fx)
-                                if out_come != temp:
+                        out_come = CoinFlip_Prog(prog, qv, cv, fx)
+                        if out_come != temp:
                                 print('Q wins!')
                                 sys.exit(0)
                 print('max entanglement!')

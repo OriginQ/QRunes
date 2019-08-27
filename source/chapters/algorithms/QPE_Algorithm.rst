@@ -123,7 +123,9 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
          // Applying a controlled single operation
         circuit controlUnitaryPower(vector<qubit> qvec, qubit controlQubit, int min) {
 
-            unitarypower(qvec, min).control(controlQubit);
+            vector<qubit> tmp_vec;
+            tmp_vec.append(controlQubit);
+            unitarypower(qvec, min).control(tmp_vec);
         }
 
         circuit QPE(vector<qubit> controlqvec, vector<qubit> targetqvec) {
@@ -206,7 +208,9 @@ C-U是一个受控U门，只有当相应的控制位（来自第一个寄存器�
         // Applying a controlled single operation
         circuit controlUnitaryPower(vector<qubit> qvec, qubit controlQubit, int min) {
 
-            unitarypower(qvec, min).control(controlQubit);
+            vector<qubit> tmp_vec;
+            tmp_vec.append(controlQubit);
+            unitarypower(qvec, min).control(tmp_vec);
         }
 
 
