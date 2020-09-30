@@ -17,7 +17,7 @@ QRunes构成：Settings, QCodes和Script。其中Settings部分定义了关于QR
 1.2.1 QRunes与QPanda/pyQPanda 
 +++++++++++++++++++++++++++++++++
 
-**#### QPanda**
+** #### QPanda **
 
 QPanda SDK是由本源量子推出的，基于量子云服务的，开源的量子软件开发包。用户可基于此开发包开发在云端执行的量子程序。QPanda使用C++语言作为经典宿主语言，支持以QRunes书写的量子语言。
 目前，QPanda支持本地仿真运行模式和云仿真运行模式，最高可支持到32位。Q-Panda提供了一个可执行的命令行程序，通过指令控制量子程序的加载、运行和读出。另外，QPanda提供了一组API，可供用户自行定制功能。
