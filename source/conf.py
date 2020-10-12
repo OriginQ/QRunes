@@ -133,7 +133,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'QPanda2introduction.tex', 'QPanda2 Introduction',
+    (master_doc, 'QRunesIntroduction.tex', 'QRunes Introduction',
      'OriginQC', 'manual'),
 ]
 
