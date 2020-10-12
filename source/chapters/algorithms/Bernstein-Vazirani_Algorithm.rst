@@ -131,9 +131,10 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
 
 下面给出 QRunes 实现 Bernstein-Vazirani 算法的代码示例：
 
-.. tabs::
+.. content-tabs::
 
-   .. code-tab:: python
+   .. tab-container:: tab1
+		:title: Python in host
 
         @settings:
             language = Python;
@@ -205,7 +206,8 @@ Bernstein-Vazirani的工作建立在Deutsch和Jozsa早期工作理论上来探�
 
             finalize()
 
-   .. code-tab:: c++
+   .. tab-container:: tab2
+		:title: C++ in host
 
         @settings:
             language = C++;
